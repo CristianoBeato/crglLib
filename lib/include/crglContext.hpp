@@ -1,0 +1,77 @@
+
+#ifndef __CRGL_CONTEXT_HPP__
+#define __CRGL_CONTEXT_HPP__
+
+namespace gl
+{
+    // current suported features
+    typedef struct coreFeatures_t
+    {
+        
+    } coreFeatures_t;
+
+    typedef struct programState_t
+    {
+        GLuint  program = 0;            // current bind program
+        GLuint  pipeline = 0;           // current bind pipeline
+        GLuint  numUniformBuffers = 0;  //
+        GLuint  numShaderStorageBuffers = 0;
+        GLuint* uniformBuffers = nullptr;
+        GLuint* shaderStorageBuffers = nullptr;
+    } programState_t;
+
+    // map the context state 
+    typedef struct coreState_t
+    {
+        GLuint              indirectDrawBuffer = 0;
+        GLuint              vertexArray = 0;
+        programState_t      programs;
+    } coreState_t;
+
+    class Context
+    {
+    public:
+        Context( void );
+        ~Context( void );
+
+        virtual bool    Create( const void* in_windowHandle) = 0;
+        virtual void    Destroy( void ) = 0;
+        virtual bool    MakeCurrent( void ) = 0;
+        virtual bool    Release( void ) = 0;
+        virtual bool    SwapBuffers( void ) = 0;
+        virtual void*   GetFunctionPointer( const char* in_name ) const;
+        virtual void    DebugOuput( const char* in_message ) const = 0;
+
+        // init OpenGL debugOuput, load functions
+        bool    Init( void );
+
+        /// @brief Clear context state, unbind buffers, textures, states to defalt
+        /// @param  
+        void    Clear( void );
+
+        /// @brief flush context state
+        /// @param  
+        void    Flush( void );
+        void    Finish( void );
+        GLuint  BindProgram( const GLuint in_program );
+        GLuint  BindPipeline( const GLuint in_pipeline );
+        GLuint  BindVertexArray( const GLuint in_vertexArray );
+        GLuint  BindShaderStorageBuffers( );
+        GLuint  BindIndirectBuffer( const GLuint in_buffer );  
+        GLuint  BindUniformBuffers( const GLuint* in_buffers, const GLintptr* in_offsets, const GLsizeiptr* in_sizes, const GLuint in_first, const GLsizei in_count );
+        GLuint  BindShaderStorageBuffers( const GLuint* in_buffers, const GLintptr* in_offsets, const GLsizeiptr* in_sizes, const GLuint in_first, const GLsizei in_count );
+        GLuint  BindTextures( const GLuint* in_textures, const GLuint* in_samplers, const GLuint in_first );
+
+        const   coreFeatures_t  Features( void ) const;  
+        const   coreState_t     CurrentState( void ) const;
+
+    private:
+        coreFeatures_t    m_features;
+        coreState_t       m_state;
+
+        void    LoadFunctions( void );
+        static void APIENTRY DebugOutputCall( GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,const void *userParam );
+    };
+
+};
+#endif //!__CRGL_CONTEXT_HPP__
