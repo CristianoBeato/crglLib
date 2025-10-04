@@ -12,7 +12,6 @@ typedef struct glCoreVertexArray_t
     GLuint* vertexBuffers = nullptr;
 }glCoreVertexArray_t;
 
-
 gl::VertexArray::VertexArray( void ) : m_vertexArray( nullptr )
 {
 }
@@ -26,8 +25,7 @@ void gl::VertexArray::Create( const vertexAttrib_t* in_vertexAttrib, const GLuin
     // make surre that we are clear beffore create a new 
     Destroy();
 
-    m_vertexArray = static_cast<glCoreVertexArray_t*>( std::malloc( sizeof( glCoreVertexArray_t ) ) );
-    std::memset( m_vertexArray, 0x00, sizeof( glCoreVertexArray_t ) ); // setzero 
+    m_vertexArray = new glCoreVertexArray_t();
 
     // Create the vertex array
     glCreateVertexArrays( 1, &m_vertexArray->vertexArray );
@@ -69,11 +67,8 @@ void gl::VertexArray::Destroy( void )
         m_vertexArray->vertexArray = 0;
     }
     
-    if ( m_vertexArray != nullptr )
-    {
-        std::free( m_vertexArray );
-        m_vertexArray = nullptr;
-    }
+    delete m_vertexArray;
+    m_vertexArray = nullptr;
 }
 
 void gl::VertexArray::BindElementBuffer( const GLuint in_buffer )

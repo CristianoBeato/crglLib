@@ -272,7 +272,7 @@ PFNGLCLIENTWAITSYNCPROC                         glClientWaitSync = nullptr;
 PFNGLDELETESYNCPROC                             glDeleteSync = nullptr;
 PFNGLWAITSYNCPROC                               glWaitSync = nullptr;
 
-void crglContext::LoadFunctions( void )
+void gl::Context::LoadFunctions( void )
 {
         //
     glIsEnabled = reinterpret_cast<PFNGLISENABLEDPROC>( GetFunctionPointer( "glIsEnabled" ) );
