@@ -368,5 +368,5 @@ GLenum gl::Format::DataType(void) const
         break;
     }
 
-    return GLenum();
+    return type;
 }
