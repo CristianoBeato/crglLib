@@ -114,8 +114,8 @@ namespace gl
                             const offsets_t in_dstOffsets,
                             const dimensions_t in_dimensions ) const;
         
-        void Invalidate( const GLint in_level, const offsets_t in_offsets = offsets_t(), const dimensions_t in_dimensions = dimensions_t() ) const;
-        void Clear( const void* in_data, const GLint in_level, const offsets_t in_offsets, const dimensions_t in_dimensions ) const;
+        void Invalidate( const GLint in_level, const offsets_t in_offsets = { 0, 0, 0 }, const dimensions_t in_dimensions = { 0, 0, 0 } ) const;
+        void Clear( const void* in_data, const GLint in_level, const offsets_t in_offsets = { 0, 0, 0 }, const dimensions_t in_dimensions = { 0, 0, 0 } ) const;
         void Parameteriv( const GLenum in_pName, const GLint* m_params ) const;
         void Parameterfv(  const GLenum in_pName, const GLfloat* m_params ) const;
         void GetParameteriv( const GLenum in_pName, GLint* m_params ) const;
