@@ -2,6 +2,7 @@
 set( CRVK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglPrecompiled.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglCore.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/source/crglFormat.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglFrameBuffer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglContext.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglBuffer.cpp
