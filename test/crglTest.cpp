@@ -61,6 +61,8 @@ const crVertexColor colors[4] =
     { 0xFF, 0x00, 0xFF },     // LB ( full magenta )
 };
 
+static void    CreateShader( gl::Shader* in_shader, const GLenum in_stage, const char* in_path );
+
 int main( int argc, char *argv[] )
 {
     crApp app = crApp();
@@ -91,9 +93,7 @@ bool crTestContext::Create( const void* in_windowHandle )
 
     m_renderContext = SDL_GL_CreateContext( m_renderWindown );
     if ( !m_renderContext )
-    {
         return false;
-    }
     
     Init();
 
@@ -236,34 +236,6 @@ void crApp::RenderFrame(void)
     m_ctx->SwapBuffers();
 }
 
-static void    CreateShader( gl::Shader* in_shader, const GLenum in_stage, const char* in_path )
-{
-    GLint sourceSize = 0;
-    GLchar* source = nullptr;
-    FILE* sourceFile = fopen( in_path, "r" );
-    if ( !sourceFile )
-    {
-        throw std::runtime_error( "can't read shader" );
-    }
-
-    // get the file size 
-    fseek( sourceFile, 0, SEEK_END );
-    sourceSize = ftell( sourceFile );
-    fseek( sourceFile, 0, SEEK_SET );
-
-    source = static_cast<GLchar*>( std::malloc( sourceSize ) );
-
-    // read file 
-    fread( source, sizeof( GLchar ), sourceSize, sourceFile );
-    // release file 
-    fclose( sourceFile );
-
-    in_shader->Create( in_stage, &source, &sourceSize, 1 );
-
-    std::free( source );
-    source = nullptr;
-}
-
 void crApp::InitOpenGL( void )
 {
     m_ctx = new crTestContext();
@@ -376,3 +348,47 @@ void crApp::FinishOpenGL( void )
         m_ctx = nullptr;
     }
 }
+
+void CreateShader( gl::Shader* in_shader, const GLenum in_stage, const char* in_path )
+{
+    GLint sourceSize = 0;
+    GLchar* source = nullptr;
+    FILE* sourceFile = fopen( in_path, "r" );
+    if ( !sourceFile )
+    {
+        throw std::runtime_error( "can't read shader" );
+    }
+
+    // get the file size 
+    fseek( sourceFile, 0, SEEK_END );
+    sourceSize = ftell( sourceFile );
+    fseek( sourceFile, 0, SEEK_SET );
+
+    source = static_cast<GLchar*>( std::malloc( sourceSize ) );
+
+    // read file 
+    fread( source, sizeof( GLchar ), sourceSize, sourceFile );
+    // release file 
+    fclose( sourceFile );
+
+    in_shader->Create( in_stage, &source, &sourceSize, 1 );
+
+    std::free( source );
+    source = nullptr;
+}
+
+static void CreateImage( gl::Image * image, const char* in_path )
+{
+    GLenum internalFormat = GL_NONE;
+    SDL_Surface* imageSurf = SDL_LoadBMP( in_path );
+    if ( !imageSurf )
+        throw std::runtime_error( SDL_GetError() );
+
+    // 
+    image->Create( GL_TEXTURE_2D, internalFormat, 1, 1, imageSurf->w, imageSurf->h, 1 );
+
+    GL_RGBA16
+
+    SDL_DestroySurface( imageSurf );
+}
+

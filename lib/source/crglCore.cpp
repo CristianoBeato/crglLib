@@ -198,14 +198,32 @@ PFNGLTEXTURESUBIMAGE3DPROC				        glTextureSubImage3D = nullptr;
 PFNGLCOPYTEXTURESUBIMAGE1DPROC                  glCopyTextureSubImage1D = nullptr;
 PFNGLCOPYTEXTURESUBIMAGE2DPROC                  glCopyTextureSubImage2D = nullptr;
 PFNGLCOPYTEXTURESUBIMAGE3DPROC                  glCopyTextureSubImage3D = nullptr;
-PFNGLTEXTUREPARAMETERIPROC				        glTextureParameteri = nullptr;
-PFNGLTEXTUREPARAMETERFPROC				        glTextureParameterf = nullptr;
+PFNGLTEXTUREPARAMETERIVPROC				        glTextureParameteriv = nullptr;
+PFNGLTEXTUREPARAMETERFVPROC				        glTextureParameterfv = nullptr;
+PFNGLGETTEXTUREPARAMETERIVPROC                  glGetTextureParameteriv = nullptr;
+PFNGLGETTEXTUREPARAMETERFVPROC                  glGetTextureParameterfv = nullptr;
 PFNGLGETTEXTURELEVELPARAMETERFVPROC             glGetTextureLevelParameterfv = nullptr;
 PFNGLGETTEXTURELEVELPARAMETERIVPROC             glGetTextureLevelParameteriv = nullptr;
 PFNGLGETTEXTUREIMAGEPROC                        glGetTextureImage = nullptr;
+PFNGLGETCOMPRESSEDTEXTUREIMAGEPROC              glGetCompressedTextureImage = nullptr;
+PFNGLINVALIDATETEXIMAGEPROC                     glInvalidateTexImage = nullptr;
+
+// GL_ARB_invalidate_subdata
+PFNGLINVALIDATETEXSUBIMAGEPROC                  glInvalidateTexSubImage = nullptr;
+
+// GL_ARB_clear_texture
+PFNGLCLEARTEXIMAGEPROC                          glClearTexImage = nullptr;
+PFNGLCLEARTEXSUBIMAGEPROC                       glClearTexSubImage = nullptr;
+
+// GL_ARB_get_texture_sub_image
+PFNGLGETTEXTURESUBIMAGEPROC                     glGetTextureSubImage = nullptr;
+PFNGLGETCOMPRESSEDTEXTURESUBIMAGEPROC           glGetCompressedTextureSubImage = nullptr;
 
 // GL_ARB_copy_image
 PFNGLCOPYIMAGESUBDATAPROC                       glCopyImageSubData = nullptr;
+
+// GL_ARB_texture_view
+PFNGLTEXTUREVIEWPROC                            glTextureView = nullptr;
 
 //
 PFNGLCREATESAMPLERSPROC                         glCreateSamplers = nullptr;
@@ -223,7 +241,7 @@ PFNGLGETSAMPLERPARAMETERIIVPROC                 glGetSamplerParameterIiv = nullp
 PFNGLGETSAMPLERPARAMETERFVPROC                  glGetSamplerParameterfv = nullptr;
 PFNGLGETSAMPLERPARAMETERIUIVPROC                glGetSamplerParameterIuiv = nullptr;
 
-// texture handler
+// GL_ARB_bindless_texture
 PFNGLGETTEXTUREHANDLEARBPROC				    glGetTextureHandleARB = nullptr;
 PFNGLGETTEXTURESAMPLERHANDLEARBPROC		        glGetTextureSamplerHandleARB = nullptr;
 PFNGLMAKETEXTUREHANDLERESIDENTARBPROC	        glMakeTextureHandleResidentARB = nullptr;
@@ -450,14 +468,32 @@ void gl::Context::LoadFunctions( void )
     glCopyTextureSubImage1D = reinterpret_cast<PFNGLCOPYTEXTURESUBIMAGE1DPROC>( GetFunctionPointer( "glCopyTextureSubImage1D" ) );
     glCopyTextureSubImage2D = reinterpret_cast<PFNGLCOPYTEXTURESUBIMAGE2DPROC>( GetFunctionPointer( "glCopyTextureSubImage2D" ) );
     glCopyTextureSubImage3D = reinterpret_cast<PFNGLCOPYTEXTURESUBIMAGE3DPROC>( GetFunctionPointer( "glCopyTextureSubImage3D" ) );
-    glTextureParameteri = reinterpret_cast<PFNGLTEXTUREPARAMETERIPROC>( GetFunctionPointer( "glTextureParameteri" ) );
-    glTextureParameterf = reinterpret_cast<PFNGLTEXTUREPARAMETERFPROC>( GetFunctionPointer( "glTextureParameterf" ) );
+    glTextureParameteriv = reinterpret_cast<PFNGLTEXTUREPARAMETERIVPROC>( GetFunctionPointer( "glTextureParameteriv" ) );
+    glTextureParameterfv = reinterpret_cast<PFNGLTEXTUREPARAMETERFVPROC>( GetFunctionPointer( "glTextureParameterfv" ) );
+    glGetTextureParameteriv = reinterpret_cast<PFNGLGETTEXTUREPARAMETERIVPROC>( GetFunctionPointer( "glGetTextureParameteriv" ) );
+    glGetTextureParameterfv = reinterpret_cast<PFNGLGETTEXTUREPARAMETERFVPROC>( GetFunctionPointer( "glGetTextureParameterfv" ) );
     glGetTextureLevelParameterfv = reinterpret_cast<PFNGLGETTEXTURELEVELPARAMETERFVPROC>( GetFunctionPointer( "glGetTextureLevelParameterfv" ) );
     glGetTextureLevelParameteriv = reinterpret_cast<PFNGLGETTEXTURELEVELPARAMETERIVPROC>( GetFunctionPointer( "glGetTextureLevelParameteriv" ) );
     glGetTextureImage = reinterpret_cast<PFNGLGETTEXTUREIMAGEPROC>( GetFunctionPointer( "glGetTextureImage" ) );
+    glGetCompressedTextureImage = reinterpret_cast<PFNGLGETCOMPRESSEDTEXTUREIMAGEPROC>( GetFunctionPointer( "glGetCompressedTextureImage" ) );
+    glInvalidateTexImage = reinterpret_cast<PFNGLINVALIDATETEXIMAGEPROC>( GetFunctionPointer( "glInvalidateTexImage" ) );
+
+    // GL_ARB_invalidate_subdata
+    glInvalidateTexSubImage = reinterpret_cast<PFNGLINVALIDATETEXSUBIMAGEPROC>( GetFunctionPointer( "glInvalidateTexSubImage" ) );
+
+    // GL_ARB_clear_texture
+    glClearTexImage = reinterpret_cast<PFNGLCLEARTEXIMAGEPROC>( GetFunctionPointer( "glClearTexImage" ) );
+    glClearTexSubImage = reinterpret_cast<PFNGLCLEARTEXSUBIMAGEPROC>( GetFunctionPointer( "glClearTexSubImage" ) );
+
+    // GL_ARB_get_texture_sub_image
+    glGetTextureSubImage = reinterpret_cast<PFNGLGETTEXTURESUBIMAGEPROC>( GetFunctionPointer( "glGetTextureSubImage" ) );
+    glGetCompressedTextureSubImage = reinterpret_cast<PFNGLGETCOMPRESSEDTEXTURESUBIMAGEPROC>( GetFunctionPointer( "glGetCompressedTextureSubImage" ) );
 
     // GL_ARB_copy_image
     glCopyImageSubData = reinterpret_cast<PFNGLCOPYIMAGESUBDATAPROC>( GetFunctionPointer( "glCopyImageSubData" ) );
+
+    // GL_ARB_texture_view
+    glTextureView = reinterpret_cast<PFNGLTEXTUREVIEWPROC>( GetFunctionPointer( "glTextureView" ) );
 
     //
     glCreateSamplers = reinterpret_cast<PFNGLCREATESAMPLERSPROC>( GetFunctionPointer( "glCreateSamplers" ) );

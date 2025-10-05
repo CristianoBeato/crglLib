@@ -199,11 +199,30 @@ extern PFNGLTEXTURESUBIMAGE3DPROC				        glTextureSubImage3D;
 extern PFNGLCOPYTEXTURESUBIMAGE1DPROC                   glCopyTextureSubImage1D;
 extern PFNGLCOPYTEXTURESUBIMAGE2DPROC                   glCopyTextureSubImage2D;
 extern PFNGLCOPYTEXTURESUBIMAGE3DPROC                   glCopyTextureSubImage3D;
-extern PFNGLTEXTUREPARAMETERIPROC				        glTextureParameteri;
-extern PFNGLTEXTUREPARAMETERFPROC				        glTextureParameterf;
+extern PFNGLTEXTUREPARAMETERIVPROC				        glTextureParameteriv;
+extern PFNGLTEXTUREPARAMETERFVPROC				        glTextureParameterfv;
+extern PFNGLGETTEXTUREPARAMETERIVPROC                   glGetTextureParameteriv;
+extern PFNGLGETTEXTUREPARAMETERFVPROC                   glGetTextureParameterfv;
 extern PFNGLGETTEXTUREIMAGEPROC					        glGetTextureImage;
+extern PFNGLGETCOMPRESSEDTEXTUREIMAGEPROC               glGetCompressedTextureImage;
+extern PFNGLINVALIDATETEXIMAGEPROC                      glInvalidateTexImage;
 
+// GL_ARB_invalidate_subdata
+extern PFNGLINVALIDATETEXSUBIMAGEPROC                   glInvalidateTexSubImage;
+
+// GL_ARB_clear_texture
+extern PFNGLCLEARTEXIMAGEPROC                           glClearTexImage;
+extern PFNGLCLEARTEXSUBIMAGEPROC                        glClearTexSubImage;
+
+// GL_ARB_get_texture_sub_image
+extern PFNGLGETTEXTURESUBIMAGEPROC                      glGetTextureSubImage;
+extern PFNGLGETCOMPRESSEDTEXTURESUBIMAGEPROC            glGetCompressedTextureSubImage;
+
+// GL_ARB_copy_image
 extern PFNGLCOPYIMAGESUBDATAPROC                        glCopyImageSubData;
+
+// GL_ARB_texture_view
+extern PFNGLTEXTUREVIEWPROC                             glTextureView;
 
 // sampler
 extern PFNGLCREATESAMPLERSPROC                          glCreateSamplers;
@@ -283,6 +302,8 @@ typedef struct glCoreRenderbuffer_t glCoreRenderbuffer_t;
 #include "crglBuffer.hpp"
 #include "crglShaders.hpp"
 #include "crglVertexArray.hpp"
+#include "crglFormat.hpp"
+#include "crglImage.hpp"
 #include "crglFrameBuffer.hpp"
 #include "crglContext.hpp"
 
