@@ -307,8 +307,8 @@ void gl::Context::LoadFunctions( void )
     glGetBooleanv = reinterpret_cast<PFNGLGETBOOLEANVPROC>( GetFunctionPointer( "glGetBooleanv" ) );
     glHint = reinterpret_cast<PFNGLHINTPROC>( GetFunctionPointer( "glHint" ) );
 
-    glViewport = reinterpret_cast<PFNGLVIEWPORTPROC>( GetFunctionPointer( "PFNGLVIEWPORTPROC" ) );
-    glScissor = reinterpret_cast<PFNGLSCISSORPROC>( GetFunctionPointer( "PFNGLSCISSORPROC" ) );
+    glViewport = reinterpret_cast<PFNGLVIEWPORTPROC>( GetFunctionPointer( "glViewport" ) );
+    glScissor = reinterpret_cast<PFNGLSCISSORPROC>( GetFunctionPointer( "glScissor" ) );
 
     // clear buffers 
     glClear = reinterpret_cast<PFNGLCLEARPROC>( GetFunctionPointer( "glClear" ) );

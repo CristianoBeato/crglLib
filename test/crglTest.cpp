@@ -44,13 +44,20 @@ const GLushort indices[6] =
     2, 1, 3
 };
 
-const crVertexPos positions[4] = 
+const crVertexPos positions[8] = 
 {
+    // non fliped for frame buffer
     // vertex positions         uv coordinate   
-    { {  0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f } }, // RT
-    { {  0.5f,  0.5f, 0.0f }, { 1.0f, 0.0f } }, // RB
-    { { -0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f } }, // LT
-    { { -0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f } }, // LB
+    { {  0.75f, -0.75f, 0.0f }, { 1.0f, 0.0f } }, // RT
+    { {  0.75f,  0.75f, 0.0f }, { 1.0f, 1.0f } }, // RB
+    { { -0.75f, -0.75f, 0.0f }, { 0.0f, 0.0f } }, // LT
+    { { -0.75f,  0.75f, 0.0f }, { 0.0f, 1.0f } }, // LB
+
+    // fliped for texture
+    { {  0.75f, -0.75f, 0.0f }, { 1.0f, 1.0f } }, // RT
+    { {  0.75f,  0.75f, 0.0f }, { 1.0f, 0.0f } }, // RB
+    { { -0.75f, -0.75f, 0.0f }, { 0.0f, 1.0f } }, // LT
+    { { -0.75f,  0.75f, 0.0f }, { 0.0f, 0.0f } }, // LB
 };
 
 const crVertexColor colors[4] = 
@@ -146,6 +153,8 @@ crApp::crApp( void ) :
     m_index( nullptr ),
     m_vertexPos( nullptr ),
     m_vertexCol( nullptr ),
+    m_framebuffer( nullptr ),
+    m_framebufferAttach( nullptr ),
     m_image( nullptr ),
     m_sampler( nullptr )
 {
@@ -238,13 +247,42 @@ void crApp::RenderFrame(void)
     m_ctx->BindVertexArray( *m_vertexArray );
     m_ctx->BindProgram( *m_program );
 
+    //_________________________________ DRAW TO FRAME BUFFER _________________________________ 
+
+    // bind the frame buffer
+    m_ctx->BindFrameBuffer( *m_framebuffer );
+
+    // set the viewport to our frame buffer size
+    glViewport(0, 0, 640, 420 ); 
+
+    // Clear our custom frame buffer colot to dark orange
+    glClearColor( 0.5f, 0.2f, 0.1, 1.0f );
+    glClear( GL_COLOR_BUFFER_BIT );
+
+    // bind texture and samples
     texture[0] = m_image->Handle();
     samples[0] = m_sampler->Handler();
     m_ctx->BindTextures( texture, samples, 0, 1 );
 
-    // clear defalt frame buffer color
+    // draw to the frame buffer 
+    //glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0 );
+    glDrawElementsBaseVertex( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0, 4 ); // we use a fliped UV vertex now
+
+    //_________________________________ DRAW TO SCREEN _________________________________ 
+
+    // bind back the defalt frame buffer
+    m_ctx->BindFrameBuffer( 0 );
+
+    // set the viewport to our screen size
+    glViewport(0, 0, 800, 600 ); 
+
+    // clear defalt frame buffer color dark gray
     glClearColor( 0.2f, 0.2f, 0.2, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+    texture[0] = m_framebufferAttach->Handle();
+    samples[0] = m_sampler->Handler(); // use the same sampler
+    m_ctx->BindTextures( texture, samples, 0, 1 );
 
     // draw 
     glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, (void*)0 );
@@ -278,8 +316,8 @@ void crApp::InitOpenGL( void )
     
     // create vertex position buffer 
     m_vertexPos = new gl::Buffer();
-    m_vertexPos->Create( GL_VERTEX_ARRAY, sizeof( crVertexPos ) * 4, nullptr, GL_DYNAMIC_STORAGE_BIT );
-    m_vertexPos->Upload( positions, 0, sizeof( crVertexPos ) * 4 );    // upload vertex buffer
+    m_vertexPos->Create( GL_VERTEX_ARRAY, sizeof( crVertexPos ) * 8, nullptr, GL_DYNAMIC_STORAGE_BIT );
+    m_vertexPos->Upload( positions, 0, sizeof( crVertexPos ) * 8 );    // upload vertex buffer
 
     // create vertex color buffer
     m_vertexCol = new gl::Buffer();
@@ -294,12 +332,30 @@ void crApp::InitOpenGL( void )
     GLsizei     vstrides[2]{ sizeof( crVertexPos ), sizeof( crVertexColor ) };
     m_vertexArray->BindeVertexBuffers( vbuffers, voffsets, vstrides, 0, 2 );
 
+    // Create framebuffer attachament
+    gl::Image::dimensions_t dim{};
+    dim.width = 640;
+    dim.height = 420;
+    m_framebufferAttach = new gl::Image();
+    m_framebufferAttach->Create( GL_TEXTURE_2D, GL_RGBA8, 1, 0, dim );
+
+    // create framebuffer
+    gl::FrameBuffer::attachament_t attch{};
+    attch.target = GL_TEXTURE_2D;
+    attch.attachament = GL_COLOR_ATTACHMENT0;
+    attch.handle = *m_framebufferAttach;
+    
+    m_framebuffer = new gl::FrameBuffer();
+    m_framebuffer->Create();
+    m_framebuffer->Attach( &attch, 0, 1 );
+
     // create and load texture
     m_image = new gl::Image();
     CreateImage( m_image, "image/grid.bmp" );
 
     m_sampler = new gl::Sampler();
     m_sampler->Create();
+
     // magnification and minification texture filtering ( trilinear ) 
     m_sampler->Parameteri( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
     m_sampler->Parameteri( GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
@@ -371,6 +427,21 @@ void crApp::FinishOpenGL( void )
         delete m_image;
     }
     
+    if( m_framebuffer != nullptr )
+    {
+        m_framebuffer->Destroy();
+        delete m_framebuffer;
+        m_framebuffer = nullptr;
+    }
+
+    if ( m_framebufferAttach != nullptr )
+    {
+        m_framebufferAttach->Destroy();
+        delete m_framebufferAttach;
+        m_framebufferAttach = nullptr;
+    }
+    
+
     if ( m_index != nullptr )
     {
         m_index->Destroy();

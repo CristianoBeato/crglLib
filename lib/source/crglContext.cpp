@@ -33,7 +33,7 @@ extern __GLXextFuncPtr glXGetProcAddressARB (const GLubyte *);
 #endif
 
 static const char k_INVALID_VERTEX_ARRAY_MSG[76] = "crglContext::BindVertexArray not recived a valid vertex array name as input";
-
+static const char k_INVALID_FRAME_BUFFER_MSG[75] = "crglContext::BindFrameBuffer not recived a valid FrameBuffer name as input";
 
 gl::Context::Context( void )
 {
@@ -212,6 +212,28 @@ GLuint gl::Context::BindVertexArray( const GLuint in_vertexArray )
     {
         glBindVertexArray( in_vertexArray );
         m_state.vertexArray = in_vertexArray;
+    }
+    
+    return current;
+}
+
+GLuint gl::Context::BindFrameBuffer(const GLuint in_framebuffer)
+{
+// current bind vertex array
+    GLuint current = m_state.frameBuffer;
+
+#if !defined( NDEBUG ) // we don't check on releases  
+    if ( ( in_framebuffer != 0 ) && ( glIsFramebuffer( in_framebuffer  ) != GL_TRUE ) )
+    {
+        glDebugMessageInsert( GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, 75, k_INVALID_FRAME_BUFFER_MSG );
+        return current;
+    }
+#endif // !NDEBUG
+
+    if ( current != in_framebuffer )
+    {
+        glBindFramebuffer( GL_FRAMEBUFFER, in_framebuffer );
+        m_state.frameBuffer = in_framebuffer;
     }
     
     return current;

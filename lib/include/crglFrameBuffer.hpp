@@ -40,18 +40,21 @@ namespace gl
     class FrameBuffer
     {
     public:
-        typedef struct 
+        typedef struct attachament_t
         {
             GLenum target;  // attachament target
             GLenum attachament;
             GLuint handle;
-        } attachament;
+        } attachament_t;
 
         FrameBuffer( void );
         ~FrameBuffer( void );
         bool    Create( void );
         void    Destroy( void );
-        bool    Attach( const attachament* in_attachaments, const GLuint in_base, const GLuint in_count );
+        bool    Attach( const attachament_t* in_attachaments, const GLuint in_base, const GLuint in_count );
+
+        GLuint  Handler( void ) const;
+        operator GLuint( void ) const;
 
     private:
         glCoreFramebuffer_t* m_frameBufferHandle;

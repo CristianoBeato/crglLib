@@ -36,6 +36,7 @@ namespace gl
     {
         GLuint              indirectDrawBuffer = 0;
         GLuint              vertexArray = 0;
+        GLuint              frameBuffer = 0;
         programState_t      programs;
         textureState_t      textures;
     } coreState_t;
@@ -69,6 +70,7 @@ namespace gl
         GLuint  BindProgram( const GLuint in_program );
         GLuint  BindPipeline( const GLuint in_pipeline );
         GLuint  BindVertexArray( const GLuint in_vertexArray );
+        GLuint  BindFrameBuffer( const GLuint in_framebuffer );
         GLuint  BindShaderStorageBuffers( );
         GLuint  BindIndirectBuffer( const GLuint in_buffer );  
         GLuint  BindUniformBuffers( const GLuint* in_buffers, const GLintptr* in_offsets, const GLsizeiptr* in_sizes, const GLuint in_first, const GLsizei in_count );

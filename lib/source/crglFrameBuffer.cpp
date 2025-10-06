@@ -121,7 +121,7 @@ void gl::FrameBuffer::Destroy( void )
     m_frameBufferHandle = nullptr;
 }
 
-bool gl::FrameBuffer::Attach(const attachament *in_attachaments, const GLuint in_base, const GLuint in_count)
+bool gl::FrameBuffer::Attach(const attachament_t *in_attachaments, const GLuint in_base, const GLuint in_count)
 {
     for ( GLuint i = 0; i < in_count; i++)
     {
@@ -155,4 +155,14 @@ bool gl::FrameBuffer::Attach(const attachament *in_attachaments, const GLuint in
         return false;
 
     return glIsFramebuffer( m_frameBufferHandle->frameBuffer ) == GL_TRUE;
+}
+
+GLuint gl::FrameBuffer::Handler(void) const
+{
+    return m_frameBufferHandle->frameBuffer;
+}
+
+gl::FrameBuffer::operator GLuint(void) const
+{
+    return m_frameBufferHandle->frameBuffer;
 }

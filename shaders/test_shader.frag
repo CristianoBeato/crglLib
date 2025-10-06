@@ -14,7 +14,7 @@ layout( binding = 0 ) uniform sampler2D samp0;
 void main( void )
 {
 #if 0
-    outColor = vec4( fragColor, 1.0 );
+    outColor = vec4( fragColor, 1.0 ) * texture( samp0, textCoord );
 #else
     outColor = texture( samp0, textCoord );
 #endif
