@@ -25,6 +25,7 @@
 
 // state cofiguration
 extern PFNGLGETINTEGERVPROC                             glGetIntegerv;
+extern PFNGLGETINTEGER64VPROC                           glGetInteger64v;
 extern PFNGLISENABLEDPROC                               glIsEnabled;
 extern PFNGLDISABLEPROC                                 glDisable;
 extern PFNGLENABLEPROC                                  glEnable;
@@ -284,23 +285,25 @@ extern PFNGLNAMEDRENDERBUFFERSTORAGEPROC                glNamedRenderbufferStora
 extern PFNGLNAMEDRENDERBUFFERSTORAGEMULTISAMPLEPROC     glNamedRenderbufferStorageMultisample;
 extern PFNGLGETNAMEDRENDERBUFFERPARAMETERIVPROC         glGetNamedRenderbufferParameteriv;
 
-// Sync
+// GL_ARB_sync
 extern PFNGLISSYNCPROC                                  glIsSync;
 extern PFNGLFENCESYNCPROC                               glFenceSync;
 extern PFNGLCLIENTWAITSYNCPROC                          glClientWaitSync;
 extern PFNGLDELETESYNCPROC                              glDeleteSync;
 extern PFNGLWAITSYNCPROC                                glWaitSync;
+extern PFNGLGETSYNCIVPROC                               glGetSynciv;
 
-typedef struct glCoreBuffer_t       glCoreBuffer_t;
-typedef struct glCoreShader_t       glCoreShader_t;
-typedef struct glCoreProgram_t      glCoreProgram_t;
-typedef struct glCorePipeline_t     glCorePipeline_t;
-typedef struct glCoreVertexArray_t  glCoreVertexArray_t;
-typedef struct glCoreImage_t        glCoreImage_t;
-typedef struct glCoreSampler_t      glCoreSampler_t;
-typedef struct glCoreFramebuffer_t  glCoreFramebuffer_t;
-typedef struct glCoreRenderbuffer_t glCoreRenderbuffer_t;
+typedef struct glCoreBuffer_t                           glCoreBuffer_t;
+typedef struct glCoreShader_t                           glCoreShader_t;
+typedef struct glCoreProgram_t                          glCoreProgram_t;
+typedef struct glCorePipeline_t                         glCorePipeline_t;
+typedef struct glCoreVertexArray_t                      glCoreVertexArray_t;
+typedef struct glCoreImage_t                            glCoreImage_t;
+typedef struct glCoreSampler_t                          glCoreSampler_t;
+typedef struct glCoreFramebuffer_t                      glCoreFramebuffer_t;
+typedef struct glCoreRenderbuffer_t                     glCoreRenderbuffer_t;
 
+#include "crglFence.hpp"
 #include "crglBuffer.hpp"
 #include "crglShaders.hpp"
 #include "crglVertexArray.hpp"

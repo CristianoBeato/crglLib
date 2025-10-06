@@ -157,6 +157,19 @@ bool gl::FrameBuffer::Attach(const attachament_t *in_attachaments, const GLuint 
     return glIsFramebuffer( m_frameBufferHandle->frameBuffer ) == GL_TRUE;
 }
 
+void gl::FrameBuffer::Blit( const GLuint in_source )
+{
+    if ( m_frameBufferHandle == nullptr )
+    {
+        // append error
+        return;
+    }
+
+    glBlitNamedFramebuffer( m_frameBufferHandle->frameBuffer, )
+    
+}
+
+
 GLuint gl::FrameBuffer::Handler(void) const
 {
     return m_frameBufferHandle->frameBuffer;

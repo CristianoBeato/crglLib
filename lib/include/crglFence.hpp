@@ -18,17 +18,27 @@
  For full license terms, see the LICENSE file in the root of this repository.
 ===============================================================================================
 */
+#ifndef __CRGL_FENCE_HPP__
+#define __CRGL_FENCE_HPP__
 
-#ifndef __CRGL_PRECOMPILED_HPP__
-#define __CRGL_PRECOMPILED_HPP__
+namespace gl
+{
+    class Fence
+    {   
+    public:
+        Fence( void );
+        ~Fence( void );
 
-#include <exception>
-#include <stdexcept> // std::runtime_error
-#include <cstring> // std::memset
-#include <limits> // std::numeric_limits
+        void    Init( const GLenum in_condition, const GLbitfield in_flags );
+        void    Release( void );
+        bool    IsSync( void ) const;        
+        GLenum  ClientWait( const GLbitfield in_flags, const GLuint64 in_timeout ) const;
+        void    Wait( const GLbitfield in_flags, const GLuint64 in_timeout ) const;
+        void    Getiv( const GLenum pname, const GLsizei count, GLsizei *length, GLint *values ) const;
 
-#include "crglCore.hpp"
-#include "crglFence.hpp"
-#include "crglContext.hpp"
+    private:
+        GLsync  m_sync;
+    };
+};
 
-#endif //!__CRGL_PRECOMPILED_HPP__
+#endif //__CRGL_FENCE_HPP__

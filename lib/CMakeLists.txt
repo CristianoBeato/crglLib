@@ -2,6 +2,7 @@
 set( CRVK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglPrecompiled.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglCore.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/source/crglFence.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglFormat.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglFrameBuffer.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglSampler.cpp
@@ -12,6 +13,8 @@ set( CRVK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglVertexArray.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/crglCore.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/crglContext.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/crglFence.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/crglFormat.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/crglFrameBuffer.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/crglSampler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/crglImage.hpp

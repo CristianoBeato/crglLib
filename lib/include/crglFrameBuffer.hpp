@@ -47,12 +47,21 @@ namespace gl
             GLuint handle;
         } attachament_t;
 
+        typedef struct rect_t
+        {
+            GLint X0; 
+            GLint Y0; 
+            GLint X1; 
+            GLint Y1;
+        } rect_t;
+        
+
         FrameBuffer( void );
         ~FrameBuffer( void );
         bool    Create( void );
         void    Destroy( void );
         bool    Attach( const attachament_t* in_attachaments, const GLuint in_base, const GLuint in_count );
-
+        
         GLuint  Handler( void ) const;
         operator GLuint( void ) const;
 

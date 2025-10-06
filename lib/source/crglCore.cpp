@@ -24,6 +24,7 @@
 
 //
 PFNGLGETINTEGERVPROC                            glGetIntegerv = nullptr;
+PFNGLGETINTEGER64VPROC                          glGetInteger64v = nullptr;
 PFNGLISENABLEDPROC                              glIsEnabled = nullptr;
 PFNGLDISABLEPROC                                glDisable = nullptr;
 PFNGLENABLEPROC                                 glEnable = nullptr;
@@ -291,11 +292,12 @@ PFNGLFENCESYNCPROC                              glFenceSync = nullptr;
 PFNGLCLIENTWAITSYNCPROC                         glClientWaitSync = nullptr;
 PFNGLDELETESYNCPROC                             glDeleteSync = nullptr;
 PFNGLWAITSYNCPROC                               glWaitSync = nullptr;
+PFNGLGETSYNCIVPROC                              glGetSynciv = nullptr;
 
 void gl::Context::LoadFunctions( void )
 {
-        //
     glGetIntegerv = reinterpret_cast<PFNGLGETINTEGERVPROC>( GetFunctionPointer( "glGetIntegerv" ) );
+    glGetInteger64v = reinterpret_cast<PFNGLGETINTEGER64VPROC>( GetFunctionPointer( "glGetInteger64v" ) );
     glIsEnabled = reinterpret_cast<PFNGLISENABLEDPROC>( GetFunctionPointer( "glIsEnabled" ) );
     glDisable = reinterpret_cast<PFNGLDISABLEPROC>( GetFunctionPointer( "glDisable" ) );
     glEnable = reinterpret_cast<PFNGLENABLEPROC>( GetFunctionPointer( "glEnable" ) );
@@ -563,4 +565,5 @@ void gl::Context::LoadFunctions( void )
     glClientWaitSync = reinterpret_cast<PFNGLCLIENTWAITSYNCPROC>( GetFunctionPointer( "glClientWaitSync" ) );
     glDeleteSync = reinterpret_cast<PFNGLDELETESYNCPROC>( GetFunctionPointer( "glDeleteSync" ) );
     glWaitSync = reinterpret_cast<PFNGLWAITSYNCPROC>( GetFunctionPointer( "glWaitSync" ) );
+    glGetSynciv = reinterpret_cast<PFNGLGETSYNCIVPROC>( GetFunctionPointer( "glGetSynciv" ) );   
 }
