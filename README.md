@@ -1,7 +1,7 @@
 # crglLib
 
 Atual Status:
-[![Build Status](https://github.com/CristianoBeato/crglLib/actions/workflows/cmake-single-platform.yml/badge.svg)](https://github.com/CristianoBeato/crglLib/actions/workflows/cmake.yml)
+[![Build Status](https://github.com/CristianoBeato/crglLib/actions/workflows/cmake.yml/badge.svg)](https://github.com/CristianoBeato/crglLib/actions/workflows/cmake.yml)
 
 PTBR:
 
