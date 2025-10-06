@@ -157,7 +157,7 @@ bool gl::FrameBuffer::Attach(const attachament_t *in_attachaments, const GLuint 
     return glIsFramebuffer( m_frameBufferHandle->frameBuffer ) == GL_TRUE;
 }
 
-void gl::FrameBuffer::Blit( const GLuint in_source )
+void gl::FrameBuffer::Blit( const GLuint in_dstFrameBuffer, const rect_t in_srcRec, const rect_t in_dstRect, const GLbitfield in_mask, const GLenum in_filter ) const
 {
     if ( m_frameBufferHandle == nullptr )
     {
@@ -165,8 +165,12 @@ void gl::FrameBuffer::Blit( const GLuint in_source )
         return;
     }
 
-    glBlitNamedFramebuffer( m_frameBufferHandle->frameBuffer, )
-    
+    glBlitNamedFramebuffer( 
+            m_frameBufferHandle->frameBuffer, 
+            in_dstFrameBuffer, 
+            in_srcRec.X0, in_srcRec.Y0, in_srcRec.X1, in_srcRec.Y1,
+            in_dstRect.X0, in_dstRect.Y0, in_dstRect.X1, in_dstRect.Y1, 
+            in_mask, in_filter );  
 }
 
 

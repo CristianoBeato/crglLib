@@ -55,13 +55,12 @@ namespace gl
             GLint Y1;
         } rect_t;
         
-
         FrameBuffer( void );
         ~FrameBuffer( void );
         bool    Create( void );
         void    Destroy( void );
         bool    Attach( const attachament_t* in_attachaments, const GLuint in_base, const GLuint in_count );
-        
+        void    Blit( const GLuint in_dstFrameBuffer, const rect_t in_srcRec, const rect_t in_dstRect, GLbitfield mask, GLenum filter ) const;
         GLuint  Handler( void ) const;
         operator GLuint( void ) const;
 
