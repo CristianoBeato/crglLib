@@ -6,6 +6,10 @@ project( crglLib )
 ## STD 17
 set( CMAKE_CXX_STANDARD 17 )
 
+# build test option
+option( BUILD_TEST	"Build Test app" OFF )
+
+
 ############################
 ##  Build Configuration   ##
 ############################
@@ -34,4 +38,7 @@ endif()
 include_directories( ${CMAKE_SOURCE_DIR}/lib/include )
 
 add_subdirectory( lib )
-add_subdirectory( test )
+
+if( BUILD_TEST )
+	add_subdirectory( test )
+endif( BUILD_TEST )
