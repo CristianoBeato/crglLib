@@ -61,7 +61,8 @@ const crVertexColor colors[4] =
     { 0xFF, 0x00, 0xFF },     // LB ( full magenta )
 };
 
-static void    CreateShader( gl::Shader* in_shader, const GLenum in_stage, const char* in_path );
+static void CreateShader( gl::Shader* in_shader, const GLenum in_stage, const char* in_path );
+static void CreateImage( gl::Image * image, const char* in_path );
 
 int main( int argc, char *argv[] )
 {
@@ -79,7 +80,9 @@ int main( int argc, char *argv[] )
     return 0;
 }
 
-crTestContext::crTestContext( void ) : m_renderWindown( nullptr ), m_renderContext( nullptr )
+crTestContext::crTestContext( void ) : 
+    m_renderWindown( nullptr ), 
+    m_renderContext( nullptr )
 {
 }
 
@@ -137,7 +140,13 @@ void crTestContext::DebugOuput( const char* in_message ) const
 
 crApp::crApp( void ) : 
     m_window( nullptr ),
-    m_ctx( nullptr )
+    m_ctx( nullptr ),
+    m_program( nullptr ),
+    m_vertexArray( nullptr ),
+    m_index( nullptr ),
+    m_vertexPos( nullptr ),
+    m_vertexCol( nullptr ),
+    m_image( nullptr )
 {
 }
 
@@ -222,8 +231,14 @@ void crApp::MainLoop( void )
 
 void crApp::RenderFrame(void)
 {
+    GLuint texture[1]{ 0 };
+    GLuint samples[1]{ 0 };
+
     m_ctx->BindVertexArray( *m_vertexArray );
     m_ctx->BindProgram( *m_program );
+
+    texture[0] = m_image->Handle();
+    m_ctx->BindTextures( texture, samples, 0, 1 );
 
     // clear defalt frame buffer color
     glClearColor( 0.2f, 0.2f, 0.2, 1.0f );
@@ -277,6 +292,10 @@ void crApp::InitOpenGL( void )
     GLsizei     vstrides[2]{ sizeof( crVertexPos ), sizeof( crVertexColor ) };
     m_vertexArray->BindeVertexBuffers( vbuffers, voffsets, vstrides, 0, 2 );
 
+    // create and load texture
+    m_image = new gl::Image();
+    CreateImage( m_image, "image/grid.bmp" );
+
     // Create program
     m_program = new gl::Program();
     
@@ -325,6 +344,12 @@ void crApp::FinishOpenGL( void )
         m_vertexPos->Destroy();
         delete m_vertexPos;
         m_vertexPos = nullptr;
+    }
+    
+    if ( m_image != nullptr )
+    {
+        m_image->Destroy();
+        delete m_image;
     }
     
     if ( m_index != nullptr )
@@ -377,18 +402,51 @@ void CreateShader( gl::Shader* in_shader, const GLenum in_stage, const char* in_
     source = nullptr;
 }
 
-static void CreateImage( gl::Image * image, const char* in_path )
+void CreateImage( gl::Image * image, const char* in_path )
 {
     GLenum internalFormat = GL_NONE;
     SDL_Surface* imageSurf = SDL_LoadBMP( in_path );
     if ( !imageSurf )
         throw std::runtime_error( SDL_GetError() );
 
-    // 
-    image->Create( GL_TEXTURE_2D, internalFormat, 1, 1, imageSurf->w, imageSurf->h, 1 );
+    switch ( imageSurf->format )
+    {
+    case SDL_PIXELFORMAT_RGBA4444:
+        internalFormat = GL_RGBA4;
+        break;
+    case SDL_PIXELFORMAT_RGBA5551:
+        internalFormat = GL_RGB5_A1;
+        break;
+    case SDL_PIXELFORMAT_RGB565:
+        internalFormat = GL_RGB565;
+        break;
+    case SDL_PIXELFORMAT_RGB24:
+        internalFormat = GL_RGB8UI;
+        break;
+    case SDL_PIXELFORMAT_BGR24:
+        internalFormat = GL_RGB8UI;
+        break;
+    case SDL_PIXELFORMAT_RGBA8888:
+        internalFormat = GL_RGBA8UI;
+        break;
+    
+    default:
+        throw std::runtime_error( "unsuported image format" );
+        break;
+    }
 
-    GL_RGBA16
-
+    // Create the image
+    gl::Image::dimensions_t dim{};
+    dim.width = imageSurf->w;
+    dim.height = imageSurf->h;
+    dim.depth = 0;
+    image->Create( GL_TEXTURE_2D, internalFormat, 1, 1, dim );
+    
+    gl::Image::offsets_t offsets{ 0, 0, 0 };
+    
+    // upload image
+    image->SubImage( 0, offsets, dim, imageSurf->pixels, true );
+    
     SDL_DestroySurface( imageSurf );
 }
 
