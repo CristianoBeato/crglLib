@@ -1,8 +1,15 @@
 # This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
 # See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
+name: Install dependencies
+
+run: sudo apt-get update && sudo apt-get install -y \
+       mesa-common-dev \
+       libgl1-mesa-dev \
+       libglu1-mesa-dev
+
 name: CMake on a single platform
 
-on:
+on: 
   push:
     branches: [ "main" ]
   pull_request:
