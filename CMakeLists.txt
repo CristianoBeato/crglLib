@@ -34,6 +34,18 @@ else()
 	#message(FATAL_ERROR "Unsupported compiler")
 endif()
 
+find_package( OpenGL REQUIRED )
+
+#
+if( OpenGL_FOUND )
+	include_directories( ${OpenGL_INCLUDE_DIR} )
+else( OpenGL_FOUND)
+	include_directories( ${CMAKE_SOURCE_DIR}/contrib/OpenGL/include )	
+endif( OpenGL_FOUND )
+
+
+
+
 # 
 include_directories( ${CMAKE_SOURCE_DIR}/lib/include )
 
