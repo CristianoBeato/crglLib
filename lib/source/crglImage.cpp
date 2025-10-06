@@ -32,7 +32,6 @@ typedef struct glCoreImage_t
     GLuint      image = 0;
 } glCoreImage_t;
 
-
 gl::Image::Image( void ) : m_image( nullptr )
 {
 }

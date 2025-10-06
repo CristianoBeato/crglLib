@@ -305,6 +305,7 @@ typedef struct glCoreRenderbuffer_t glCoreRenderbuffer_t;
 #include "crglShaders.hpp"
 #include "crglVertexArray.hpp"
 #include "crglFormat.hpp"
+#include "crglSampler.hpp"
 #include "crglImage.hpp"
 #include "crglFrameBuffer.hpp"
 #include "crglContext.hpp"

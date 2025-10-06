@@ -4,6 +4,7 @@ set( CRVK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglCore.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglFormat.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglFrameBuffer.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/source/crglSampler.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglImage.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglContext.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/source/crglBuffer.cpp
@@ -12,6 +13,7 @@ set( CRVK_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/crglCore.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/crglContext.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/crglFrameBuffer.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/crglSampler.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/crglImage.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/crglBuffer.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/include/crglShaders.hpp
