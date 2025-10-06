@@ -34,7 +34,7 @@ else()
 	#message(FATAL_ERROR "Unsupported compiler")
 endif()
 
-find_package( OpenGL REQUIRED )
+find_package( OpenGL )
 
 #
 if( OpenGL_FOUND )

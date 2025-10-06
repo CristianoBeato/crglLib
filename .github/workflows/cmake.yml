@@ -31,7 +31,7 @@ jobs:
       # Dependências no Windows (via vcpkg ou chocolatey, se precisar)
     - name: Install dependencies (Windows)
       if: matrix.os == 'windows-latest'
-      run: choco install cmake --installargs '"ADD_CMAKE_TO_PATH=System"' | choco install opengl
+      run: choco install cmake --installargs '"ADD_CMAKE_TO_PATH=System"' #| choco install opengl
 
     - name: Configure CMake
       # Configure CMake in a 'build' subdirectory. `CMAKE_BUILD_TYPE` is only required if you are using a single-configuration generator such as make.
