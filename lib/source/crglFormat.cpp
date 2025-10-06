@@ -187,10 +187,6 @@ GLenum gl::Format::DataType(void) const
 
     switch ( internalFormat )
     {
-    case GL_R8:
-    case GL_RG8:
-    case GL_RGB8:
-    case GL_RGBA8:
     case GL_RG8I:
     case GL_RGB8I:
     case GL_RGBA8I:
@@ -198,12 +194,16 @@ GLenum gl::Format::DataType(void) const
     case GL_RG8_SNORM:
     case GL_RGB8_SNORM:
     case GL_RGBA8_SNORM:
+    case GL_R3_G3_B2:
+    type = GL_BYTE; 
+    break;
+    
+    case GL_R8:
+    case GL_RG8:
+    case GL_RGB8:
+    case GL_RGBA8:
     case GL_SRGB8:
     case GL_SRGB8_ALPHA8:
-    case GL_R3_G3_B2:
-        type = GL_BYTE; 
-        break;
-    
     case GL_R8UI:
     case GL_RG8UI:
     case GL_RGB8UI:
@@ -211,10 +211,6 @@ GLenum gl::Format::DataType(void) const
         type = GL_UNSIGNED_BYTE; 
         break;
 
-    case GL_R16:
-    case GL_RG16:
-    case GL_RGB16:
-    case GL_RGBA16:
     case GL_R16I:
     case GL_RG16I:
     case GL_RGB16I:
@@ -226,6 +222,10 @@ GLenum gl::Format::DataType(void) const
         type = GL_SHORT; 
         break;
     
+    case GL_R16:
+    case GL_RG16:
+    case GL_RGB16:
+    case GL_RGBA16:
     case GL_R16UI:
     case GL_RG16UI:
     case GL_RGB16UI:

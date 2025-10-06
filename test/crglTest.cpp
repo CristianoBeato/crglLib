@@ -47,10 +47,10 @@ const GLushort indices[6] =
 const crVertexPos positions[4] = 
 {
     // vertex positions         uv coordinate   
-    { {  0.5f, -0.5f, 0.0f }, { 1.0f, 0.0f } }, // RT
-    { {  0.5f,  0.5f, 0.0f }, { 1.0f, 1.0f } }, // RB
-    { { -0.5f, -0.5f, 0.0f }, { 0.0f, 0.0f } }, // LT
-    { { -0.5f,  0.5f, 0.0f }, { 0.0f, 1.0f } }, // LB
+    { {  0.5f, -0.5f, 0.0f }, { 1.0f, 1.0f } }, // RT
+    { {  0.5f,  0.5f, 0.0f }, { 1.0f, 0.0f } }, // RB
+    { { -0.5f, -0.5f, 0.0f }, { 0.0f, 1.0f } }, // LT
+    { { -0.5f,  0.5f, 0.0f }, { 0.0f, 0.0f } }, // LB
 };
 
 const crVertexColor colors[4] = 
@@ -146,7 +146,8 @@ crApp::crApp( void ) :
     m_index( nullptr ),
     m_vertexPos( nullptr ),
     m_vertexCol( nullptr ),
-    m_image( nullptr )
+    m_image( nullptr ),
+    m_sampler( nullptr )
 {
 }
 
@@ -238,6 +239,7 @@ void crApp::RenderFrame(void)
     m_ctx->BindProgram( *m_program );
 
     texture[0] = m_image->Handle();
+    samples[0] = m_sampler->Handler();
     m_ctx->BindTextures( texture, samples, 0, 1 );
 
     // clear defalt frame buffer color
@@ -296,6 +298,16 @@ void crApp::InitOpenGL( void )
     m_image = new gl::Image();
     CreateImage( m_image, "image/grid.bmp" );
 
+    m_sampler = new gl::Sampler();
+    m_sampler->Create();
+    // magnification and minification texture filtering ( trilinear ) 
+    m_sampler->Parameteri( GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+    m_sampler->Parameteri( GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+
+    // texture repeating ( no repeat )
+    m_sampler->Parameteri( GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER );
+    m_sampler->Parameteri( GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER );
+
     // Create program
     m_program = new gl::Program();
     
@@ -344,6 +356,13 @@ void crApp::FinishOpenGL( void )
         m_vertexPos->Destroy();
         delete m_vertexPos;
         m_vertexPos = nullptr;
+    }
+
+    if( m_sampler != nullptr )
+    {
+        m_sampler->Destroy();
+        delete m_sampler;
+        m_sampler = nullptr;
     }
     
     if ( m_image != nullptr )
@@ -421,10 +440,10 @@ void CreateImage( gl::Image * image, const char* in_path )
         internalFormat = GL_RGB565;
         break;
     case SDL_PIXELFORMAT_RGB24:
-        internalFormat = GL_RGB8UI;
+        internalFormat = GL_RGB8;
         break;
     case SDL_PIXELFORMAT_BGR24:
-        internalFormat = GL_RGB8UI;
+        internalFormat = GL_RGB8;
         break;
     case SDL_PIXELFORMAT_RGBA8888:
         internalFormat = GL_RGBA8UI;
@@ -446,7 +465,7 @@ void CreateImage( gl::Image * image, const char* in_path )
     
     // upload image
     image->SubImage( 0, offsets, dim, imageSurf->pixels, true );
-    
+
     SDL_DestroySurface( imageSurf );
 }
 

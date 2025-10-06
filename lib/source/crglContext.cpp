@@ -41,6 +41,12 @@ gl::Context::Context( void )
 
 gl::Context::~Context( void )
 {
+    Destroy();
+}
+
+void gl::Context::Destroy(void)
+{
+    Finalize();
 }
 
 #if 0
@@ -243,8 +249,11 @@ GLuint gl::Context::BindShaderStorageBuffers(const GLuint *in_buffers, const GLi
 
 GLuint gl::Context::BindTextures(const GLuint *in_textures, const GLuint *in_samplers, const GLuint in_first, const GLuint in_count)
 {
-    GLuint first = 0;
-    GLuint textureCount = in_first + in_count; //
+    if( ( in_first + in_count ) > static_cast<GLuint>( m_features.maxCombined ) )
+    {
+        // todo: return a error
+        return std::numeric_limits<GLuint>::max();
+    }
 
     std::memcpy( &m_state.textures.textures[in_first], in_textures, sizeof( GLuint ) * in_count );    
     std::memcpy( &m_state.textures.samplers[in_first], in_samplers, sizeof( GLuint ) * in_count );

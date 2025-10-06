@@ -47,7 +47,7 @@ namespace gl
         ~Context( void );
 
         virtual bool    Create( const void* in_windowHandle) = 0;
-        virtual void    Destroy( void ) = 0;
+        virtual void    Destroy( void );
         virtual bool    MakeCurrent( void ) = 0;
         virtual bool    Release( void ) = 0;
         virtual bool    SwapBuffers( void ) = 0;

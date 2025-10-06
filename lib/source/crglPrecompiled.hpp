@@ -5,6 +5,7 @@
 #include <exception>
 #include <stdexcept> // std::runtime_error
 #include <cstring> // std::memset
+#include <limits> // std::numeric_limits
 
 #include "crglCore.hpp"
 #include "crglBuffer.hpp"

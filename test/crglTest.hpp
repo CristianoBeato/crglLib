@@ -39,6 +39,7 @@ private:
     gl::Buffer*         m_vertexPos;
     gl::Buffer*         m_vertexCol;
     gl::Image*          m_image;
+    gl::Sampler*        m_sampler;
 
     void    InitSDL3( void );
     void    FinishSDL3( void );
