@@ -133,7 +133,7 @@ namespace gl
         {
         }
 
-        Format( const GLenum in_format ) : internalFormat( GL_NONE )
+        Format( const GLenum &in_format ) : internalFormat( in_format )
         {
         }
 
@@ -141,6 +141,12 @@ namespace gl
         GLenum  ColorChanels( const bool in_inverse ) const;
         GLenum  DataType( void ) const;
         
+        GLenum operator = ( const GLenum &in_format )
+        {
+            internalFormat = in_format;
+            return internalFormat;
+        }
+
         operator GLenum( void ) const { return internalFormat; }
     };
 };

@@ -7,15 +7,26 @@ namespace gl
     // current suported features
     typedef struct coreFeatures_t
     {
-        
+        GLint maxTextures = 0;
+        GLint maxCombined = 0;
+        GLint maxUBOBindings = 0;
+        GLint maxSSBOBindings = 0;
+        GLint maxAtomicBindings = 0;
+        GLint maxTFBindings = 0;
+        GLint maxVBOBindings = 0;
+        GLint maxVertexAttribs = 0;
     } coreFeatures_t;
+
+    typedef struct textureState_t
+    {
+        GLuint* samplers = nullptr;
+        GLuint* textures = nullptr;
+    } textureState_t;
 
     typedef struct programState_t
     {
         GLuint  program = 0;            // current bind program
         GLuint  pipeline = 0;           // current bind pipeline
-        GLuint  numUniformBuffers = 0;  //
-        GLuint  numShaderStorageBuffers = 0;
         GLuint* uniformBuffers = nullptr;
         GLuint* shaderStorageBuffers = nullptr;
     } programState_t;
@@ -26,6 +37,7 @@ namespace gl
         GLuint              indirectDrawBuffer = 0;
         GLuint              vertexArray = 0;
         programState_t      programs;
+        textureState_t      textures;
     } coreState_t;
 
     class Context
@@ -44,6 +56,7 @@ namespace gl
 
         // init OpenGL debugOuput, load functions
         bool    Init( void );
+        void    Finalize( void );
 
         /// @brief Clear context state, unbind buffers, textures, states to defalt
         /// @param  
@@ -60,7 +73,7 @@ namespace gl
         GLuint  BindIndirectBuffer( const GLuint in_buffer );  
         GLuint  BindUniformBuffers( const GLuint* in_buffers, const GLintptr* in_offsets, const GLsizeiptr* in_sizes, const GLuint in_first, const GLsizei in_count );
         GLuint  BindShaderStorageBuffers( const GLuint* in_buffers, const GLintptr* in_offsets, const GLsizeiptr* in_sizes, const GLuint in_first, const GLsizei in_count );
-        GLuint  BindTextures( const GLuint* in_textures, const GLuint* in_samplers, const GLuint in_first );
+        GLuint  BindTextures( const GLuint* in_textures, const GLuint* in_samplers, const GLuint in_first, const GLuint in_count );
 
         const   coreFeatures_t  Features( void ) const;  
         const   coreState_t     CurrentState( void ) const;

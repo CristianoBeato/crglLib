@@ -23,6 +23,7 @@
 #include "crglCore.hpp"
 
 //
+PFNGLGETINTEGERVPROC                            glGetIntegerv = nullptr;
 PFNGLISENABLEDPROC                              glIsEnabled = nullptr;
 PFNGLDISABLEPROC                                glDisable = nullptr;
 PFNGLENABLEPROC                                 glEnable = nullptr;
@@ -229,6 +230,7 @@ PFNGLTEXTUREVIEWPROC                            glTextureView = nullptr;
 PFNGLCREATESAMPLERSPROC                         glCreateSamplers = nullptr;
 PFNGLDELETESAMPLERSPROC                         glDeleteSamplers = nullptr;
 PFNGLBINDSAMPLERPROC                            glBindSampler = nullptr;
+PFNGLBINDSAMPLERSPROC                           glBindSamplers = nullptr;
 PFNGLISSAMPLERPROC                              glIsSampler = nullptr;
 PFNGLSAMPLERPARAMETERIPROC                      glSamplerParameteri = nullptr;
 PFNGLSAMPLERPARAMETERIVPROC                     glSamplerParameteriv = nullptr;
@@ -293,6 +295,7 @@ PFNGLWAITSYNCPROC                               glWaitSync = nullptr;
 void gl::Context::LoadFunctions( void )
 {
         //
+    glGetIntegerv = reinterpret_cast<PFNGLGETINTEGERVPROC>( GetFunctionPointer( "glGetIntegerv" ) );
     glIsEnabled = reinterpret_cast<PFNGLISENABLEDPROC>( GetFunctionPointer( "glIsEnabled" ) );
     glDisable = reinterpret_cast<PFNGLDISABLEPROC>( GetFunctionPointer( "glDisable" ) );
     glEnable = reinterpret_cast<PFNGLENABLEPROC>( GetFunctionPointer( "glEnable" ) );
@@ -499,6 +502,7 @@ void gl::Context::LoadFunctions( void )
     glCreateSamplers = reinterpret_cast<PFNGLCREATESAMPLERSPROC>( GetFunctionPointer( "glCreateSamplers" ) );
     glDeleteSamplers = reinterpret_cast<PFNGLDELETESAMPLERSPROC>( GetFunctionPointer( "glDeleteSamplers" ) );
     glBindSampler = reinterpret_cast<PFNGLBINDSAMPLERPROC>( GetFunctionPointer( "glBindSampler" ) );
+    glBindSamplers = reinterpret_cast<PFNGLBINDSAMPLERSPROC>( GetFunctionPointer( "glBindSamplers" ) );
     glIsSampler = reinterpret_cast<PFNGLISSAMPLERPROC>( GetFunctionPointer( "glIsSampler" ) );
     glSamplerParameteri = reinterpret_cast<PFNGLSAMPLERPARAMETERIPROC>( GetFunctionPointer( "glSamplerParameteri" ) );
     glSamplerParameteriv = reinterpret_cast<PFNGLSAMPLERPARAMETERIVPROC>( GetFunctionPointer( "glSamplerParameteriv" ) );

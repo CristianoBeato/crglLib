@@ -110,10 +110,10 @@ void gl::Image::Destroy( void )
 void gl::Image::SubImage(   const GLint in_level,
                             const offsets_t in_offsets,
                             const dimensions_t in_dimensions,
-                            const GLenum in_type,
-                            const void* in_pixels ) const
+                            const void* in_pixels, const bool in_invBGR ) const
 {
     GLenum format = GL_NONE;
+    GLenum type = GL_NONE;
 
     if( !m_image )
     {   
@@ -121,23 +121,24 @@ void gl::Image::SubImage(   const GLint in_level,
         return;
     }
 
-    format = m_image->format.ColorChanels( false ); // TODO: RGB or BGR
+    format = m_image->format.ColorChanels( in_invBGR );
+    type = m_image->format.DataType();
 
     switch ( m_image->target )
     {
     case GL_TEXTURE_1D:
-        glTextureSubImage1D( m_image->image, in_level, in_offsets.xoffset, in_dimensions.width, format, in_type, in_pixels );
+        glTextureSubImage1D( m_image->image, in_level, in_offsets.xoffset, in_dimensions.width, format, type, in_pixels );
         break;
     case GL_TEXTURE_1D_ARRAY:
     case GL_TEXTURE_2D:
     case GL_TEXTURE_RECTANGLE:
-        glTextureSubImage2D( m_image->image, in_level, in_offsets.xoffset, in_offsets.yoffset, in_dimensions.width, in_dimensions.height, format, in_type, in_pixels );
+        glTextureSubImage2D( m_image->image, in_level, in_offsets.xoffset, in_offsets.yoffset, in_dimensions.width, in_dimensions.height, format, type, in_pixels );
         break;        
     case GL_TEXTURE_2D_ARRAY:
     case GL_TEXTURE_CUBE_MAP:
     case GL_TEXTURE_3D:
     case GL_TEXTURE_CUBE_MAP_ARRAY:
-        glTextureSubImage3D( m_image->image, in_level, in_offsets.xoffset, in_offsets.yoffset, in_offsets.zoffset, in_dimensions.width, in_dimensions.height, in_dimensions.depth, format, in_type, in_pixels );
+        glTextureSubImage3D( m_image->image, in_level, in_offsets.xoffset, in_offsets.yoffset, in_offsets.zoffset, in_dimensions.width, in_dimensions.height, in_dimensions.depth, format, type, in_pixels );
         break;        
     default:
         glDebugMessageInsert( GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, 44, k_INVALID_SUBIMAGE_TEXTURE_TARGET_MSG );

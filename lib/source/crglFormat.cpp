@@ -88,7 +88,7 @@ GLenum gl::Format::ColorChanels( const bool in_inverse ) const
     case GL_RGB565:
     case GL_RGB10:
     case GL_RGB12:
-        format = ( in_inverse ) ? GL_RGB : GL_BGR;
+        format = ( in_inverse ) ? GL_BGR : GL_RGB;
         break;
 
     case GL_RGBA8:
@@ -110,7 +110,7 @@ GLenum gl::Format::ColorChanels( const bool in_inverse ) const
     case GL_RGB10_A2:
     case GL_RGB10_A2UI:
     case GL_RGBA12:
-        format = ( in_inverse ) ? GL_RGBA : GL_BGRA;
+        format = ( in_inverse ) ? GL_BGRA : GL_RGBA;
         break;
         
     case GL_DEPTH_COMPONENT16:

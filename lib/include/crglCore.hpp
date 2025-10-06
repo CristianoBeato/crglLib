@@ -24,6 +24,7 @@
 #include <GL/glcorearb.h>
 
 // state cofiguration
+extern PFNGLGETINTEGERVPROC                             glGetIntegerv;
 extern PFNGLISENABLEDPROC                               glIsEnabled;
 extern PFNGLDISABLEPROC                                 glDisable;
 extern PFNGLENABLEPROC                                  glEnable;
@@ -228,6 +229,7 @@ extern PFNGLTEXTUREVIEWPROC                             glTextureView;
 extern PFNGLCREATESAMPLERSPROC                          glCreateSamplers;
 extern PFNGLDELETESAMPLERSPROC                          glDeleteSamplers;
 extern PFNGLBINDSAMPLERPROC                             glBindSampler;
+extern PFNGLBINDSAMPLERSPROC                            glBindSamplers;
 extern PFNGLISSAMPLERPROC                               glIsSampler;
 extern PFNGLSAMPLERPARAMETERIPROC                       glSamplerParameteri;
 extern PFNGLSAMPLERPARAMETERIVPROC                      glSamplerParameteriv;

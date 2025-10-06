@@ -40,6 +40,15 @@ namespace gl
             GLsizei depth = 0;
         };
 
+        struct subImage_t
+        {
+            GLint           level;      // mip level
+            GLuint          layer;      //
+            offsets_t       offsets;    //
+            dimensions_t    dimension;  //
+        };
+        
+
         Image( void );
         ~Image( void );
 
@@ -52,9 +61,8 @@ namespace gl
         void    Destroy( void );
         void    SubImage(   const GLint in_level, 
                             const offsets_t in_offsets,
-                            const dimensions_t in_dimensions, 
-                            const GLenum in_type, 
-                            const void *in_pixels ) const;
+                            const dimensions_t in_dimensions,   
+                            const void *in_pixels, const bool in_invBGR = false ) const;
 
         /// @brief Return the whole image data
         void GetImage( const GLint in_level, const GLsizei in_bufSize, void * in_pixels ) const;

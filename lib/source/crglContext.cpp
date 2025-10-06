@@ -71,7 +71,47 @@ bool gl::Context::Init( void )
     glDebugMessageCallback( DebugOutputCall, this ); // set callback
     glDebugMessageControl( GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE ); // Ativa tudo
 
+    // Get context properties
+
+    // max texture units
+    glGetIntegerv( GL_MAX_TEXTURE_IMAGE_UNITS, &m_features.maxTextures );
+    glGetIntegerv( GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &m_features.maxCombined );
+
+    // max buffer bindings 
+    glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &m_features.maxUBOBindings );
+    glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &m_features.maxSSBOBindings );
+    glGetIntegerv(GL_MAX_ATOMIC_COUNTER_BUFFER_BINDINGS, &m_features.maxAtomicBindings );
+    glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_BUFFERS, &m_features.maxTFBindings );
+
+    glGetIntegerv(GL_MAX_VERTEX_ATTRIB_BINDINGS, &m_features.maxVBOBindings );
+
+    //
+    glGetIntegerv( GL_MAX_VERTEX_ATTRIBS, &m_features.maxVertexAttribs );
+    
+    // create the binding array
+    m_state.textures.samplers = static_cast<GLuint*>( std::malloc( sizeof( GLuint ) * m_features.maxCombined ) );
+    m_state.textures.textures = static_cast<GLuint*>( std::malloc( sizeof( GLuint ) * m_features.maxCombined ) );
+    
+    // create the shader buffers binding arrays
+    m_state.programs.uniformBuffers = static_cast<GLuint*>( std::malloc( sizeof( GLuint ) * m_features.maxUBOBindings ) );
+    m_state.programs.shaderStorageBuffers = static_cast<GLuint*>( std::malloc( sizeof( GLuint ) * m_features.maxUBOBindings ) );
+
     return true;
+}
+
+void gl::Context::Finalize( void )
+{
+    std::free( m_state.programs.uniformBuffers );
+    m_state.programs.uniformBuffers = nullptr;
+    
+    std::free( m_state.programs.shaderStorageBuffers );
+    m_state.programs.shaderStorageBuffers = nullptr;
+
+    std::free( m_state.textures.samplers );
+    m_state.textures.samplers = nullptr;
+    
+    std::free( m_state.textures.textures );
+    m_state.textures.textures = nullptr;   
 }
 
 void gl::Context::Clear( void )
@@ -85,25 +125,15 @@ void gl::Context::Clear( void )
     if ( m_state.programs.uniformBuffers )
     {
         // unbind all buffers 
-        std::memset( m_state.programs.uniformBuffers, 0x00, m_state.programs.numUniformBuffers * sizeof( GLuint ) );
-        glBindBuffersBase( GL_UNIFORM_BUFFER, 0, m_state.programs.numUniformBuffers, m_state.programs.uniformBuffers );
-        
-        // release the buffer list
-        std::free( m_state.programs.uniformBuffers );
-        m_state.programs.uniformBuffers = nullptr;
-        m_state.programs.numUniformBuffers = 0;
+        std::memset( m_state.programs.uniformBuffers, 0x00, sizeof( GLuint ) *  m_features.maxUBOBindings );
+        glBindBuffersBase( GL_UNIFORM_BUFFER, 0,  m_features.maxUBOBindings, m_state.programs.uniformBuffers );        
     }
 
-   if ( m_state.programs.shaderStorageBuffers )
+    if ( m_state.programs.shaderStorageBuffers )
     {
         // unbind all buffers 
-        std::memset( m_state.programs.shaderStorageBuffers, 0x00, m_state.programs.numShaderStorageBuffers * sizeof( GLuint ) );
-        glBindBuffersBase( GL_SHADER_STORAGE_BUFFER, 0, m_state.programs.numShaderStorageBuffers, m_state.programs.shaderStorageBuffers );
-        
-        // release the buffer list
-        std::free( m_state.programs.shaderStorageBuffers );
-        m_state.programs.shaderStorageBuffers = nullptr;
-        m_state.programs.numShaderStorageBuffers = 0;
+        std::memset( m_state.programs.shaderStorageBuffers, 0x00, sizeof( GLuint ) * m_features.maxSSBOBindings );
+        glBindBuffersBase( GL_SHADER_STORAGE_BUFFER, 0, m_features.maxSSBOBindings, m_state.programs.shaderStorageBuffers );        
     }
 }
 
@@ -189,52 +219,39 @@ GLuint gl::Context::BindIndirectBuffer( const GLuint in_buffer )
         glBindBuffer( GL_DRAW_INDIRECT_BUFFER, in_buffer );
         m_state.indirectDrawBuffer = in_buffer;
     }
+
+    
     
     return current;
 }
 
-GLuint gl::Context::BindUniformBuffers(const GLuint *in_buffers, const GLintptr *in_offsets, const GLsizeiptr *in_sizes, const GLuint in_first, const GLsizei in_count)
+GLuint gl::Context::BindUniformBuffers(const GLuint *in_buffers, const GLintptr *in_offsets, const GLsizeiptr *in_sizes, const GLuint in_first, const GLsizei in_count )
 {
-    GLuint first = 0;
-    GLuint bufferCount = in_first + in_count; //
- 
-    // realloc buffers to fit 
-    if ( m_state.programs.numUniformBuffers < bufferCount )
-    {
-        m_state.programs.uniformBuffers = static_cast<GLuint*>( std::realloc( m_state.programs.uniformBuffers, sizeof( GLuint ) * bufferCount ) );
-        m_state.programs.numUniformBuffers = bufferCount; 
-    }
-
-    first = m_state.programs.uniformBuffers[in_first];
-    for ( GLsizei i = in_first; i < in_count; i++ )
-    {
-        m_state.programs.uniformBuffers[i] = in_buffers[i];
-    }
-    
+    // todo clamp to the max suported buffers
+    std::memcpy( &m_state.programs.uniformBuffers[in_first], in_buffers, sizeof( GLuint ) * in_count );
     glBindBuffersRange( GL_UNIFORM_BUFFER, in_first, in_count, in_buffers, in_offsets, in_sizes );
-    return first;
+    return 0; //TODO: change
 }
 
 GLuint gl::Context::BindShaderStorageBuffers(const GLuint *in_buffers, const GLintptr *in_offsets, const GLsizeiptr *in_sizes, const GLuint in_first, const GLsizei in_count)
 {
-    GLuint first = 0;
-    GLuint bufferCount = in_first + in_count; //
-    
-    // realloc buffers to fit 
-    if ( m_state.programs.numUniformBuffers < bufferCount )
-    {
-        m_state.programs.uniformBuffers = static_cast<GLuint*>( std::realloc( m_state.programs.uniformBuffers, sizeof( GLuint ) * bufferCount ) );
-        m_state.programs.numUniformBuffers = bufferCount; 
-    }
-    
-    first = m_state.programs.uniformBuffers[in_first];
-    for ( GLsizei i = in_first; i < in_count; i++)
-    {
-        m_state.programs.uniformBuffers[i] = in_buffers[i];
-    }
-    
+    // todo clamp to the max suported buffers
+    std::memcpy( &m_state.programs.shaderStorageBuffers[in_first], in_buffers, sizeof( GLuint ) * in_count );
     glBindBuffersRange( GL_SHADER_STORAGE_BUFFER, in_first, in_count, in_buffers, in_offsets, in_sizes );
-    return first;
+    return 0; //TODO:
+}
+
+GLuint gl::Context::BindTextures(const GLuint *in_textures, const GLuint *in_samplers, const GLuint in_first, const GLuint in_count)
+{
+    GLuint first = 0;
+    GLuint textureCount = in_first + in_count; //
+
+    std::memcpy( &m_state.textures.textures[in_first], in_textures, sizeof( GLuint ) * in_count );    
+    std::memcpy( &m_state.textures.samplers[in_first], in_samplers, sizeof( GLuint ) * in_count );
+
+    glBindTextures( in_first, in_count, in_textures );
+    glBindSamplers( in_first, in_count, in_samplers );
+    return GLuint();
 }
 
 void APIENTRY gl::Context::DebugOutputCall( GLenum in_source, GLenum in_type, GLuint in_id, GLenum in_severity, GLsizei in_length, const GLchar *in_message, const void *in_userParam )
