@@ -201,7 +201,7 @@ GLuint gl::Context::BindVertexArray( const GLuint in_vertexArray )
     GLuint current = m_state.vertexArray;
 
 #if !defined( NDEBUG ) // we don't check on releases  
-    if ( glIsVertexArray( in_vertexArray ) != GL_TRUE )
+    if ( in_vertexArray != 0 && glIsVertexArray( in_vertexArray ) != GL_TRUE )
     {
         glDebugMessageInsert( GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, 76, k_INVALID_VERTEX_ARRAY_MSG );
         return current;
@@ -385,7 +385,7 @@ void APIENTRY gl::Context::DebugOutputCall( GLenum in_source, GLenum in_type, GL
         break;
     }
 
-    std::snprintf( message, 512, "OpenGL Info: %s %s, from %s :\n * %s", type, severity, source, in_message );
+    std::snprintf( message, 512, " * OpenGL Info: %s %s, from %s :\n * %s\n", type, severity, source, in_message );
 
     ctx->DebugOuput( message );
 }

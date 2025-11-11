@@ -41,11 +41,13 @@ extern PFNGLVIEWPORTPROC                                glViewport;
 extern PFNGLSCISSORPROC                                 glScissor;
 
 // clear buffer 
-extern PFNGLCLEARPROC                                   glClear;
+
+extern PFNGLBLENDFUNCPROC                               glBlendFunc;
 
 // color buffer 
 extern PFNGLCLEARCOLORPROC                              glClearColor;
 extern PFNGLCOLORMASKPROC                               glColorMask;
+extern PFNGLCLEARPROC                                   glClear;
 extern PFNGLBLENDFUNCSEPARATEPROC                       glBlendFuncSeparate;
 extern PFNGLLOGICOPPROC                                 glLogicOp;
 
@@ -126,6 +128,7 @@ extern PFNGLVERTEXARRAYVERTEXBUFFERPROC                 glVertexArrayVertexBuffe
 extern PFNGLVERTEXARRAYVERTEXBUFFERSPROC                glVertexArrayVertexBuffers; 
 
 // shader 
+extern PFNGLISSHADERPROC                                glIsShader;
 extern PFNGLCREATESHADERPROC                            glCreateShader;
 extern PFNGLDELETESHADERPROC                            glDeleteShader;
 extern PFNGLSHADERSOURCEPROC                            glShaderSource;

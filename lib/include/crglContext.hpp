@@ -97,8 +97,8 @@ namespace gl
         GLuint  BindShaderStorageBuffers( const GLuint* in_buffers, const GLintptr* in_offsets, const GLsizeiptr* in_sizes, const GLuint in_first, const GLsizei in_count );
         GLuint  BindTextures( const GLuint* in_textures, const GLuint* in_samplers, const GLuint in_first, const GLuint in_count );
 
-        const   coreFeatures_t  Features( void ) const;  
-        const   coreState_t     CurrentState( void ) const;
+        const   coreFeatures_t  Features( void ) const { return m_features };
+        const   coreState_t     CurrentState( void ) const { return m_state; }
 
     private:
         coreFeatures_t    m_features;

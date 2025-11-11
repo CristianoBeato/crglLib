@@ -42,9 +42,11 @@ PFNGLSCISSORPROC                                glScissor = nullptr;
 // clear buffer 
 PFNGLCLEARPROC                                  glClear = nullptr;
 
+
 // color buffer 
 PFNGLCLEARCOLORPROC                             glClearColor = nullptr;
 PFNGLCOLORMASKPROC                              glColorMask = nullptr;
+PFNGLBLENDFUNCPROC                              glBlendFunc = nullptr;
 PFNGLBLENDFUNCSEPARATEPROC                      glBlendFuncSeparate = nullptr;
 PFNGLLOGICOPPROC                                glLogicOp = nullptr;
 
@@ -125,6 +127,7 @@ PFNGLVERTEXARRAYVERTEXBUFFERPROC                glVertexArrayVertexBuffer = null
 PFNGLVERTEXARRAYVERTEXBUFFERSPROC               glVertexArrayVertexBuffers = nullptr; 
 
 // shader 
+PFNGLISSHADERPROC                               glIsShader = nullptr;
 PFNGLCREATESHADERPROC                           glCreateShader = nullptr;
 PFNGLDELETESHADERPROC                           glDeleteShader = nullptr;
 PFNGLSHADERSOURCEPROC                           glShaderSource = nullptr;
@@ -318,6 +321,7 @@ void gl::Context::LoadFunctions( void )
     // color buffer 
     glClearColor = reinterpret_cast<PFNGLCLEARCOLORPROC>( GetFunctionPointer( "glClearColor" ) );
     glColorMask = reinterpret_cast<PFNGLCOLORMASKPROC>( GetFunctionPointer( "glColorMask" ) );
+    glBlendFunc = reinterpret_cast<PFNGLBLENDFUNCPROC>( GetFunctionPointer( "glBlendFunc" ) );
     glBlendFuncSeparate = reinterpret_cast<PFNGLBLENDFUNCSEPARATEPROC>( GetFunctionPointer( "glBlendFuncSeparate" ) );
     glLogicOp = reinterpret_cast<PFNGLLOGICOPPROC>( GetFunctionPointer( "glLogicOp" ) );
 
@@ -398,6 +402,7 @@ void gl::Context::LoadFunctions( void )
     glVertexArrayVertexBuffers = reinterpret_cast<PFNGLVERTEXARRAYVERTEXBUFFERSPROC>( GetFunctionPointer( "glVertexArrayVertexBuffers" ) ); 
 
     // shader 
+    glIsShader = reinterpret_cast<PFNGLISSHADERPROC>( GetFunctionPointer( "glIsShader" ) );
     glCreateShader = reinterpret_cast<PFNGLCREATESHADERPROC>( GetFunctionPointer( "glCreateShader" ) );
     glDeleteShader = reinterpret_cast<PFNGLDELETESHADERPROC>( GetFunctionPointer( "glDeleteShader" ) );
     glShaderSource = reinterpret_cast<PFNGLSHADERSOURCEPROC>( GetFunctionPointer( "glShaderSource" ) );
