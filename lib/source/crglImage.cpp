@@ -88,7 +88,7 @@ bool gl::Image::Create(
         return false;
     }
 
-    return false;
+    return m_image->image != 0 && glIsTexture( m_image->image ) == GL_TRUE;
 }
 
 void gl::Image::Destroy( void )

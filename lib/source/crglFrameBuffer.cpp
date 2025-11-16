@@ -59,6 +59,8 @@ bool gl::RenderBuffer::Create( const GLuint in_width, const GLuint in_height, co
         glNamedRenderbufferStorageMultisample( m_renderBufferHandle->renderBuffer, in_samples, in_format, in_width, in_height );
     else
         glNamedRenderbufferStorage( m_renderBufferHandle->renderBuffer, in_format, in_width, in_height );   
+
+    return m_renderBufferHandle->renderBuffer != 0 && glIsRenderbuffer( m_renderBufferHandle->renderBuffer ) == GL_TRUE;
 }
 
 void gl::RenderBuffer::Destroy( void )
@@ -103,7 +105,7 @@ bool gl::FrameBuffer::Create( void )
     m_frameBufferHandle = static_cast<glCoreFramebuffer_t*>( std::malloc( sizeof( glCoreFramebuffer_t ) ) );
     glCreateFramebuffers( 1, &m_frameBufferHandle->frameBuffer );
 
-    return true;
+    return glIsFramebuffer( m_frameBufferHandle->frameBuffer );
 }
 
 void gl::FrameBuffer::Destroy( void )
