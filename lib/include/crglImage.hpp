@@ -26,6 +26,21 @@ namespace gl
     class Image
     {
     public:
+        enum target_t
+        {
+            TEXTURE_NONE = GL_NONE,
+            TEXTURE_1D = GL_TEXTURE_1D,
+            TEXTURE_1D_ARRAY = GL_TEXTURE_1D_ARRAY,
+            TEXTURE_2D = GL_TEXTURE_2D,
+            TEXTURE_2D_ARRAY = GL_TEXTURE_2D_ARRAY,
+            TEXTURE_2D_MULTISAMPLE = GL_TEXTURE_2D_MULTISAMPLE,
+            TEXTURE_2D_MULTISAMPLE_ARRAY = GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
+            TEXTURE_3D = GL_TEXTURE_3D,
+            TEXTURE_CUBE_MAP = GL_TEXTURE_CUBE_MAP,
+            TEXTURE_CUBE_MAP_ARRAY = GL_TEXTURE_CUBE_MAP_ARRAY,
+            TEXTURE_RECTANGLE = GL_TEXTURE_RECTANGLE
+        };
+
         struct offsets_t
         {
             GLint xoffset = 0; 
@@ -52,7 +67,7 @@ namespace gl
         Image( void );
         ~Image( void );
 
-        bool    Create( const GLenum in_target, 
+        bool    Create( const target_t in_target, 
                         const GLenum in_internalformat, 
                         const GLsizei in_levels,
                         const GLsizei in_layers, 

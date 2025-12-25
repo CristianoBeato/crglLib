@@ -27,9 +27,9 @@ static const char k_INVALID_SUBIMAGE_TEXTURE_TARGET_MSG[44] = { "gl::Image::SubI
 
 typedef struct glCoreImage_t
 {
-    GLenum      target = 0;
-    gl::Format  format = 0;
-    GLuint      image = 0;
+    gl::Image::target_t     target = gl::Image::TEXTURE_NONE;
+    gl::Format              format = 0;
+    GLuint                  image = 0;
 } glCoreImage_t;
 
 gl::Image::Image( void ) : m_image( nullptr )
@@ -42,7 +42,7 @@ gl::Image::~Image( void )
 }
 
 bool gl::Image::Create( 
-    const GLenum in_target, 
+    const target_t in_target, 
     const GLenum in_internalformat, 
     const GLsizei in_levels,
     const GLsizei in_layers, 
