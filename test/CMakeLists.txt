@@ -10,4 +10,11 @@ set( CRGLTEST_LIBRARIES crglLib ${SDL3_LIBRARIES} )
 
 add_executable( crglTest ${CRGLTEST_SOURCES} )
 add_dependencies( crglTest crglLib )
+
+set( EGL_CONTEXT TRUE )
+
+if( EGL_CONTEXT )
+    target_compile_definitions( crglTest PRIVATE USE_EGL_CONTEXT )
+endif( EGL_CONTEXT )
+
 target_link_libraries( crglTest PRIVATE ${CRGLTEST_LIBRARIES} )

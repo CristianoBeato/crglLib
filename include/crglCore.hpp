@@ -318,4 +318,8 @@ typedef struct glCoreRenderbuffer_t                     glCoreRenderbuffer_t;
 #include "crglFrameBuffer.hpp"
 #include "crglContext.hpp"
 
+#ifdef USE_EGL_CONTEXT
+#include "creglContext.hpp"
+#endif // USE_EGL_CONTEXT
+
 #endif //!__CRGL_CORE_HPP__
