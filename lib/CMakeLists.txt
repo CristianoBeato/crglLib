@@ -13,6 +13,7 @@ set( CRVK_SOURCES
     ../source/crglShaders.cpp
     ../source/crglVertexArray.cpp
     ../include/crglCore.hpp
+    ../include/crglEnumerators.hpp
     ../include/crglContext.hpp
     ../include/crglFence.hpp
     ../include/crglFormat.hpp
