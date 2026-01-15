@@ -67,6 +67,10 @@ extern PFNGLSTENCILMASKPROC                             glStencilMask;
 extern PFNGLSTENCILFUNCPROC                             glStencilFunc;
 extern PFNGLSTENCILOPPROC                               glStencilOp;
 
+extern PFNGLSTENCILFUNCSEPARATEPROC                     glStencilFuncSeparate;
+extern PFNGLSTENCILOPSEPARATEPROC                       glStencilOpSeparate;
+extern PFNGLSTENCILMASKSEPARATEPROC                     glStencilMaskSeparate;
+
 // polygon 
 extern PFNGLLINEWIDTHPROC                               glLineWidth;
 extern PFNGLPOINTSIZEPROC                               glPointSize;
@@ -318,6 +322,7 @@ typedef struct glCoreImageHandler_t                     glCoreImageHandler_t;
 typedef struct glCoreFramebuffer_t                      glCoreFramebuffer_t;
 typedef struct glCoreRenderbuffer_t                     glCoreRenderbuffer_t;
 
+#include "crglEnumerators.hpp"
 #include "crglFence.hpp"
 #include "crglBuffer.hpp"
 #include "crglShaders.hpp"

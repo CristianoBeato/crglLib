@@ -71,7 +71,7 @@ PFNGLSTENCILOPPROC                              glStencilOp = nullptr;
 
 PFNGLSTENCILFUNCSEPARATEPROC                    glStencilFuncSeparate = nullptr;
 PFNGLSTENCILOPSEPARATEPROC                      glStencilOpSeparate = nullptr;
-
+PFNGLSTENCILMASKSEPARATEPROC                    glStencilMaskSeparate = nullptr;
 
 // polygon 
 PFNGLLINEWIDTHPROC                              glLineWidth = nullptr;
@@ -360,6 +360,11 @@ void gl::Context::LoadFunctions( void )
     glStencilMask = reinterpret_cast<PFNGLSTENCILMASKPROC>( GetFunctionPointer( "glStencilMask" ) );
     glStencilFunc = reinterpret_cast<PFNGLSTENCILFUNCPROC>( GetFunctionPointer( "glStencilFunc" ) );
     glStencilOp = reinterpret_cast<PFNGLSTENCILOPPROC>( GetFunctionPointer( "glStencilOp" ) );
+
+    //
+    glStencilFuncSeparate = reinterpret_cast<PFNGLSTENCILFUNCSEPARATEPROC>( GetFunctionPointer( "glStencilFuncSeparate" ) );
+    glStencilOpSeparate = reinterpret_cast<PFNGLSTENCILOPSEPARATEPROC>( GetFunctionPointer( "glStencilOpSeparate" ) );
+    glStencilMaskSeparate = reinterpret_cast<PFNGLSTENCILMASKSEPARATEPROC>( GetFunctionPointer( "glStencilMaskSeparate" ) );
 
     // polygon 
     glLineWidth = reinterpret_cast<PFNGLLINEWIDTHPROC>( GetFunctionPointer( "glLineWidth" ) );
