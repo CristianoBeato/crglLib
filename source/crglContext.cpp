@@ -180,6 +180,23 @@ void gl::Context::Finish( void )
     glFinish();
 }
 
+gl::faceCull_t gl::Context::SetFaceCulling(const faceCull_t &in_cullState)
+{
+    faceCull_t current = m_state.cullingState;
+
+    if ( current.enable != in_cullState.enable )
+    {
+        if ( in_cullState.enable )
+            glEnable( CULL_FACE );
+        else
+            glDisable( CULL_FACE );
+    }
+    
+    /// update culling state 
+    m_state.cullingState = in_cullState;
+    return current;
+}
+
 gl::blendingState_t gl::Context::SetBlendState( const GLuint in_drawBuffer, const blendingState_t in_state )
 {
 #if !defined( NDEBUG ) // we don't check on releases  
@@ -194,39 +211,66 @@ gl::blendingState_t gl::Context::SetBlendState( const GLuint in_drawBuffer, cons
     if ( current.blend != in_state.blend )
     {
         if ( in_state.blend )
-            glEnablei( GL_BLEND, in_drawBuffer );
+            glEnablei( BLEND, in_drawBuffer );
         else
-            glDisablei( GL_BLEND, in_drawBuffer );
+            glDisablei( BLEND, in_drawBuffer );
     }
 
-    if( current.colorLogic != in_state.colorLogic )
-    {
-        if ( current.colorLogic )
-            glEnablei( GL_COLOR_LOGIC_OP, in_drawBuffer );
-        else
-            glDisablei( GL_COLOR_LOGIC_OP, in_drawBuffer );
-    }
+    // update function
+    if ( current.function != in_state.function )
+        glBlendFuncSeparatei( in_drawBuffer, in_state.function.srcRGB, in_state.function.dstRGB, in_state.function.srcAlpha, in_state.function.dstAlpha );
 
-    if ( current.sfactorRGB != in_state.sfactorRGB && current.dfactorRGB != in_state.dfactorRGB && current.sfactorAlpha != in_state.sfactorAlpha && current.dfactorAlpha != in_state.dfactorAlpha )
-        glBlendFuncSeparatei( in_drawBuffer, in_state.sfactorRGB, in_state.dfactorRGB, in_state.sfactorAlpha, in_state.dfactorAlpha );
-
-    if ( current.modeRGB != in_state.modeRGB && current.modeAlpha != in_state.modeAlpha )
-        glBlendEquationSeparatei( in_drawBuffer, in_state.modeRGB, in_state.modeRGB );
+    // update equation
+    if ( current.equation != in_state.equation )
+        glBlendEquationSeparatei( in_drawBuffer, in_state.equation.modeRGB, in_state.equation.modeAlpha );
 
     // update blending state
     m_state.drawBuffers[in_drawBuffer].blending = in_state;
     return current;
 }
 
-gl::stencilState_t gl::Context::SetStencilState(const stencilState_t in_steate)
+gl::stencilState_t gl::Context::SetStencilState(const stencilState_t in_state)
 {
     stencilState_t current = m_state.stencilState;
 
-    glClearStencil();
-    glStencilFuncSeparate();
-    glStencilOpSeparate
+    if ( current.testing != in_state.testing )
+    {
+        if ( in_state.testing == GL_TRUE )
+            glEnable( STENCIL_TEST );
+        else
+            glDisable( STENCIL_TEST );
+    }
     
-    return stencilState_t();
+    // stencil clear value
+    if ( current.clear != in_state.clear )
+        glClearStencil( in_state.clear );
+
+    // front face mask
+    if ( current.maskFront != in_state.maskFront )
+        glStencilMaskSeparate( FRONT, in_state.maskFront );
+    
+    // back face mask
+    if ( current.maskBack != in_state.maskBack )
+        glStencilMaskSeparate( BACK, in_state.maskBack );
+    
+    // front face state
+    if ( current.funcFront != in_state.funcFront )
+        glStencilFuncSeparate( FRONT, in_state.funcFront.func, in_state.funcFront.ref, in_state.funcFront.mask );
+    
+    // back face state
+    if ( current.funcBack != in_state.funcBack )
+        glStencilFuncSeparate( BACK, in_state.funcBack.func, in_state.funcBack.ref, in_state.funcBack.mask );
+
+    // front face operation
+    if ( current.opFront != in_state.opFront )
+        glStencilOpSeparate( FRONT, in_state.opFront.sfail, in_state.opFront.dpfail, in_state.opFront.dppass );
+
+    // back face operation
+    if ( current.opFront != in_state.opFront )
+        glStencilOpSeparate( BACK, in_state.opFront.sfail, in_state.opFront.dpfail, in_state.opFront.dppass );
+
+    current = in_state;
+    return current;
 }
 
 gl::depthState_t gl::Context::SetDepthState( const depthState_t in_state )
@@ -236,17 +280,17 @@ gl::depthState_t gl::Context::SetDepthState( const depthState_t in_state )
     if ( current.testing != in_state.testing )
     {
         if ( in_state.testing )
-            glEnable( GL_DEPTH_TEST  );
+            glEnable( DEPTH_TEST  );
         else
-            glDisable( GL_DEPTH_TEST );        
+            glDisable( DEPTH_TEST );        
     }
 
     if ( current.clamp != in_state.clamp )
     {
         if ( in_state.clamp )
-            glEnable( GL_DEPTH_CLAMP  );
+            glEnable( DEPTH_CLAMP  );
         else
-            glDisable( GL_DEPTH_CLAMP );        
+            glDisable( DEPTH_CLAMP );        
     }
 
     // update clear alpha color
@@ -259,6 +303,7 @@ gl::depthState_t gl::Context::SetDepthState( const depthState_t in_state )
     if ( current.func != in_state.func )
         glDepthFunc( in_state.func );
     
+    // TODO: move to poligon properties
     if ( current.factor != in_state.factor && current.units != in_state.units )
         glPolygonOffset( in_state.factor, in_state.units );
 

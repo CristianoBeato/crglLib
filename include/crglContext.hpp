@@ -54,32 +54,125 @@ namespace gl
         GLuint* shaderStorageBuffers = nullptr;
     } programState_t;
 
+    /// @brief The ref​ defines the fragment's stencil value for all fragments generated for the given facing.
+    /// The fragment stencil value will be clamped to the range defined by the stencil buffer's bitdepth.
+    /// The first step of the stencil test is to get the destination stencil value from the stencil buffer (called Ds). 
+    /// This is an unsigned integer value. The fragment's stencil value will be called Fs.
+    /// The next step is to perform a bitwise AND with both Fs and Ds, against the mask​ parameter for both. 
+    /// This allows the user to mask off certain stencil bits, reserving them for different conditional tests. 
+    /// This results in two masked unsigned integers, Fm and Dm.
+    /// Then the stencil test itself is performed between Fm and Dm, based on the func​ parameter. 
+    /// The test is of the form (Fm FUNC Dm); the masked fragment value is on the left-hand side.
+    struct stencilFunc_t
+    { 
+        compare_t       func = ALWAYS;
+        GLint           ref;
+        GLuint          mask;
+
+        bool operator==( const stencilFunc_t& other ) const 
+        {
+            return ( func == other.func ) && ( ref == other.ref ) && ( mask == other.mask );
+        }
+
+        bool operator!=(const stencilFunc_t& other) const 
+        {
+            return ( func != other.func ) || ( ref != other.ref ) || ( mask != other.mask );
+        }
+    };
+
+    struct stencilOp_t
+    {
+        operation_t  sfail = KEEP;
+        operation_t  dpfail = KEEP;
+        operation_t  dppass = KEEP;
+
+        bool operator==( const stencilOp_t& other ) const 
+        {
+            return ( sfail == other.sfail ) && ( dpfail == other.dpfail ) && ( dppass == other.dppass );
+        }
+
+        bool operator!=(const stencilOp_t& other) const 
+        {
+            return ( sfail != other.sfail ) || ( dpfail != other.dpfail ) || ( dppass != other.dppass );
+        }
+    };
+    
+    typedef struct faceCull_t
+    {
+        boolean     enable = FALSE;
+        face_t      face = BACK;
+    } faceCull_t;
+
     typedef struct stencilState_t
     {
-        
+        boolean         testing = FALSE;
+        GLint           clear = 0xFF;
+        GLuint          maskFront = 0x00;
+        GLuint          maskBack = 0x00;
+        stencilFunc_t   funcFront;
+        stencilFunc_t   funcBack;      
+        stencilOp_t     opFront;
+        stencilOp_t     opBack;
     } stencilState_t;
 
     typedef struct depthState_t
     {
-        GLboolean   testing = GL_FALSE;
-        GLboolean   clamp = GL_FALSE;
-        GLboolean   mask = GL_FALSE;
-        GLboolean   func = GL_LESS;
-        GLdouble    clear = 0.0;
-        GLfloat     factor = 0.0f;
-        GLfloat     units = 0.0f; 
+        boolean     testing = FALSE;
+        boolean     clamp   = FALSE;
+        GLboolean   mask    = FALSE;
+        compare_t   func    = LESS;
+        GLdouble    clear   = 0.0;
+        GLfloat     factor  = 0.0f;
+        GLfloat     units   = 0.0f; 
     } depthState_t;
+
+    typedef struct logicalOperationState_t
+    {
+        boolean                         enabled = FALSE;
+        logicalOperation::operation_t   mode = logicalOperation::COPY;
+    };
+
+    typedef struct blendEquation_t
+    {
+        blend::equation_t       modeRGB     = blend::FUNC_ADD; 
+        blend::equation_t       modeAlpha   = blend::FUNC_ADD;
+
+        bool operator==( const blendEquation_t& other ) const
+        {
+            return ( modeRGB == other.modeRGB ) && ( modeAlpha == other.modeAlpha );
+        }
+
+        bool operator!=( const blendEquation_t& other ) const 
+        {
+            return ( modeRGB == other.modeRGB ) && ( modeAlpha == other.modeAlpha );
+        }
+    
+    } blendEquation_t;
+
+    typedef struct blendFunction_t
+    {
+        blend::factor_t         srcRGB      = blend::ONE;
+        blend::factor_t         dstRGB      = blend::ZERO; 
+        blend::factor_t         srcAlpha    = blend::ONE; 
+        blend::factor_t         dstAlpha    = blend::ZERO;
+
+        bool operator==( const blendFunction_t& other ) const 
+        {
+            return ( srcRGB == other.srcRGB ) && ( dstRGB == other.dstRGB ) && ( srcAlpha == other.srcAlpha ) && ( dstAlpha == other.dstAlpha );
+        }
+
+        bool operator!=( const blendFunction_t& other ) const 
+        {
+            return ( srcRGB != other.srcRGB ) || ( dstRGB != other.dstRGB ) || ( srcAlpha != other.srcAlpha ) || ( dstAlpha != other.dstAlpha );
+        }
+        
+    } blendFunction_t;
 
     typedef struct blendingState_t
     {
-        GLboolean   blend = GL_FALSE;
-        GLboolean   colorLogic = GL_FALSE;
-        GLenum      modeRGB = GL_FUNC_ADD; 
-        GLenum      modeAlpha = GL_FUNC_ADD;
-        GLenum      sfactorRGB = GL_ONE;
-        GLenum      dfactorRGB = GL_ZERO; 
-        GLenum      sfactorAlpha = GL_ONE; 
-        GLenum      dfactorAlpha = GL_ZERO;
+        boolean                 blend = FALSE;
+        blendEquation_t         equation;
+        blendFunction_t         function;
     } blendingState_t;
 
     typedef struct drawbuffer_t
@@ -106,13 +199,14 @@ namespace gl
     // map the context state 
     typedef struct coreState_t
     {
-        GLboolean           discardRaster = GL_FALSE;
-        GLboolean           multisampling = GL_FALSE;
+        boolean             discardRaster = FALSE;
+        boolean             multisampling = FALSE;
         GLuint              indirectDrawBuffer = 0;
         GLuint              vertexArray = 0;
         GLuint              frameBuffer = 0;
         programState_t      programs;
         textureState_t      textures;
+        faceCull_t          cullingState;
         stencilState_t      stencilState;
         depthState_t        depthState;
         drawbuffer_t*       drawBuffers;
@@ -157,6 +251,8 @@ namespace gl
         /// @param  
         void    Flush( void );
         void    Finish( void );
+
+        faceCull_t  SetFaceCulling( const faceCull_t& in_cullState );
 
         /// @brief Update the blend operation states
         /// @param in_state the new blending state
@@ -205,6 +301,14 @@ namespace gl
         void    BlitToCurrentFrameBuffer( const GLuint in_source, const rect_t in_srcRect, const rect_t in_dstRect, const GLbitfield in_mask, const GLenum in_filter );
         
         const   coreFeatures_t  Features( void ) const { return m_features; };
+
+        /// @brief return the stencil set status
+        const stencilState_t  CurrentStencilStatus( void ) const { return m_state.stencilState; }
+
+        /// @brief return the depth set status
+        const depthState_t    CurrentDepthStatus( void ) const { return m_state.depthState; }
+
+        /// @brief return the gobal context status
         const   coreState_t     CurrentState( void ) const { return m_state; }
 
     private:
@@ -216,4 +320,5 @@ namespace gl
     };
 
 };
+
 #endif //!__CRGL_CONTEXT_HPP__
