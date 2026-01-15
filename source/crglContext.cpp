@@ -34,6 +34,7 @@ extern __GLXextFuncPtr glXGetProcAddressARB (const GLubyte *);
 
 static const char k_INVALID_VERTEX_ARRAY_MSG[76] = "crglContext::BindVertexArray not recived a valid vertex array name as input";
 static const char k_INVALID_FRAME_BUFFER_MSG[75] = "crglContext::BindFrameBuffer not recived a valid FrameBuffer name as input";
+static const char k_INVALID_BLEND_DRAW_BUFFER_INDEX[58] = "crglContext::SetBlendState draw buffer index out of range";
 
 gl::Context::Context( void )
 {
@@ -83,6 +84,9 @@ bool gl::Context::Init( void )
     glGetIntegerv( GL_MAX_TEXTURE_IMAGE_UNITS, &m_features.maxTextures );
     glGetIntegerv( GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &m_features.maxCombined );
 
+    // max frame buffer attachaments
+    glGetIntegerv( GL_MAX_COLOR_ATTACHMENTS, &m_features.maxColorAttachments );
+
     // max buffer bindings 
     glGetIntegerv(GL_MAX_UNIFORM_BUFFER_BINDINGS, &m_features.maxUBOBindings );
     glGetIntegerv(GL_MAX_SHADER_STORAGE_BUFFER_BINDINGS, &m_features.maxSSBOBindings );
@@ -90,10 +94,17 @@ bool gl::Context::Init( void )
     glGetIntegerv(GL_MAX_TRANSFORM_FEEDBACK_BUFFERS, &m_features.maxTFBindings );
 
     glGetIntegerv(GL_MAX_VERTEX_ATTRIB_BINDINGS, &m_features.maxVBOBindings );
+    
+    // GL_ARB_viewport_array
+    // max viewport/scizzor binding
+    glGetIntegerv( GL_MAX_VIEWPORTS, &m_features.maxViewports );
 
     //
     glGetIntegerv( GL_MAX_VERTEX_ATTRIBS, &m_features.maxVertexAttribs );
     
+    // GL_ARB_draw_buffers_blend
+    glGetIntegerv( GL_MAX_DRAW_BUFFERS, &m_features.maxDrawBuffers );
+
     // create the binding array
     m_state.textures.samplers = static_cast<GLuint*>( std::malloc( sizeof( GLuint ) * m_features.maxCombined ) );
     m_state.textures.textures = static_cast<GLuint*>( std::malloc( sizeof( GLuint ) * m_features.maxCombined ) );
@@ -102,11 +113,23 @@ bool gl::Context::Init( void )
     m_state.programs.uniformBuffers = static_cast<GLuint*>( std::malloc( sizeof( GLuint ) * m_features.maxUBOBindings ) );
     m_state.programs.shaderStorageBuffers = static_cast<GLuint*>( std::malloc( sizeof( GLuint ) * m_features.maxUBOBindings ) );
 
+    // max render buffers
+    m_state.drawBuffers = static_cast<drawbuffer_t*>( std::malloc( sizeof(drawbuffer_t) * m_features.maxDrawBuffers ) );
+
+    // create the viewport array
+    m_state.viewports = static_cast<viewport_t*>( std::malloc( sizeof( viewport_t ) * m_features.maxViewports ) );
+
     return true;
 }
 
 void gl::Context::Finalize( void )
-{
+{   
+    std::free( m_state.viewports );
+    m_state.viewports = nullptr;
+
+    std::free( m_state.drawBuffers );
+    m_state.drawBuffers = nullptr;
+
     std::free( m_state.programs.uniformBuffers );
     m_state.programs.uniformBuffers = nullptr;
     
@@ -143,6 +166,10 @@ void gl::Context::Clear( void )
     }
 }
 
+void gl::Context::Sync(void)
+{
+}
+
 void gl::Context::Flush( void )
 {
     glFlush();
@@ -153,7 +180,146 @@ void gl::Context::Finish( void )
     glFinish();
 }
 
-GLuint gl::Context::BindProgram( const GLuint in_program )
+gl::blendingState_t gl::Context::SetBlendState( const GLuint in_drawBuffer, const blendingState_t in_state )
+{
+#if !defined( NDEBUG ) // we don't check on releases  
+    if ( in_drawBuffer >= m_features.maxDrawBuffers )
+    {
+        glDebugMessageInsert( GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, 58, k_INVALID_BLEND_DRAW_BUFFER_INDEX );
+        return {};
+    }
+#endif // !NDEBUG
+    
+    blendingState_t current = m_state.drawBuffers[in_drawBuffer].blending;
+    if ( current.blend != in_state.blend )
+    {
+        if ( in_state.blend )
+            glEnablei( GL_BLEND, in_drawBuffer );
+        else
+            glDisablei( GL_BLEND, in_drawBuffer );
+    }
+
+    if( current.colorLogic != in_state.colorLogic )
+    {
+        if ( current.colorLogic )
+            glEnablei( GL_COLOR_LOGIC_OP, in_drawBuffer );
+        else
+            glDisablei( GL_COLOR_LOGIC_OP, in_drawBuffer );
+    }
+
+    if ( current.sfactorRGB != in_state.sfactorRGB && current.dfactorRGB != in_state.dfactorRGB && current.sfactorAlpha != in_state.sfactorAlpha && current.dfactorAlpha != in_state.dfactorAlpha )
+        glBlendFuncSeparatei( in_drawBuffer, in_state.sfactorRGB, in_state.dfactorRGB, in_state.sfactorAlpha, in_state.dfactorAlpha );
+
+    if ( current.modeRGB != in_state.modeRGB && current.modeAlpha != in_state.modeAlpha )
+        glBlendEquationSeparatei( in_drawBuffer, in_state.modeRGB, in_state.modeRGB );
+
+    // update blending state
+    m_state.drawBuffers[in_drawBuffer].blending = in_state;
+    return current;
+}
+
+gl::stencilState_t gl::Context::SetStencilState(const stencilState_t in_steate)
+{
+    stencilState_t current = m_state.stencilState;
+
+    glClearStencil();
+    glStencilFuncSeparate();
+    glStencilOpSeparate
+    
+    return stencilState_t();
+}
+
+gl::depthState_t gl::Context::SetDepthState( const depthState_t in_state )
+{
+    depthState_t current = m_state.depthState;
+
+    if ( current.testing != in_state.testing )
+    {
+        if ( in_state.testing )
+            glEnable( GL_DEPTH_TEST  );
+        else
+            glDisable( GL_DEPTH_TEST );        
+    }
+
+    if ( current.clamp != in_state.clamp )
+    {
+        if ( in_state.clamp )
+            glEnable( GL_DEPTH_CLAMP  );
+        else
+            glDisable( GL_DEPTH_CLAMP );        
+    }
+
+    // update clear alpha color
+    if ( current.clear != in_state.clear )
+        glClearDepth( in_state.clear );
+    
+    if ( current.mask != in_state.mask )
+        glDepthMask( in_state.mask );
+    
+    if ( current.func != in_state.func )
+        glDepthFunc( in_state.func );
+    
+    if ( current.factor != in_state.factor && current.units != in_state.units )
+        glPolygonOffset( in_state.factor, in_state.units );
+
+    m_state.depthState = in_state;
+    return current;
+}
+
+gl::viewport_t gl::Context::SetViewportState(const GLuint in_viewport, const viewport_t in_state )
+{
+    viewport_t current = m_state.viewports[in_viewport]; 
+
+    if ( in_viewport >= m_features.maxViewports )
+    {
+        // todo append a error
+        return {};
+    }
+    
+    if (    current.left != in_state.left || 
+            current.bottom != in_state.bottom || 
+            current.width != in_state.width ||
+            current.height != in_state.height )
+
+        glViewportIndexedf( in_viewport, in_state.left, in_state.bottom, in_state.width, in_state.height );
+    
+    // update depth range
+    if ( current.near != in_state.near && current.far != in_state.far )
+        glDepthRangeIndexed( in_viewport, in_state.near, in_state.far );
+    
+    m_state.viewports[in_viewport] = in_state;
+    return current;
+}
+
+GLboolean gl::Context::Multisample(const GLboolean in_enable)
+{
+    GLboolean current = m_state.multisampling;
+    if ( in_enable != current )
+     {
+        if ( in_enable == GL_TRUE )
+            glEnable( GL_MULTISAMPLE );
+        else
+            glDisable( GL_MULTISAMPLE );    
+    }
+
+    return current;
+}
+
+GLboolean gl::Context::DiscardRaster(const GLboolean in_enable)
+{
+    GLboolean current = m_state.discardRaster; 
+    if ( in_enable != current )
+    {
+        if ( in_enable == GL_TRUE )
+            glEnable( GL_RASTERIZER_DISCARD );
+        else
+            glDisable( GL_RASTERIZER_DISCARD );    
+    }
+
+    return current;
+}
+
+GLuint gl::Context::BindProgram(const GLuint in_program)
 {
     GLuint current = m_state.programs.program;
     
@@ -283,6 +449,31 @@ GLuint gl::Context::BindTextures(const GLuint *in_textures, const GLuint *in_sam
     glBindTextures( in_first, in_count, in_textures );
     glBindSamplers( in_first, in_count, in_samplers );
     return GLuint();
+}
+
+void gl::Context::BlitToCurrentFrameBuffer(const GLuint in_source, const rect_t in_srcRect, const rect_t in_dstRect, const GLbitfield in_mask, const GLenum in_filter )
+{
+    // TODO: append a error if the source and destiantion are te same
+    if( in_source == m_state.frameBuffer )
+    {
+        return;
+    }
+
+    // todo: implement a filter type error check
+
+    glBlitNamedFramebuffer( in_source,              // pixel source frame buffer 
+                            m_state.frameBuffer,    // pixel destination frame buffer 
+                            in_srcRect.x, 
+                            in_srcRect.y, 
+                            in_srcRect.x + in_srcRect.width,
+                            in_srcRect.y + in_srcRect.height,
+                            in_dstRect.x,
+                            in_dstRect.y,
+                            in_dstRect.x + in_dstRect.width,
+                            in_dstRect.y + in_dstRect.height,
+                            in_mask,
+                            in_filter );
+
 }
 
 void APIENTRY gl::Context::DebugOutputCall( GLenum in_source, GLenum in_type, GLuint in_id, GLenum in_severity, GLsizei in_length, const GLchar *in_message, const void *in_userParam )

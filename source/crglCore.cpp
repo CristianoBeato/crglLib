@@ -28,6 +28,8 @@ PFNGLGETINTEGER64VPROC                          glGetInteger64v = nullptr;
 PFNGLISENABLEDPROC                              glIsEnabled = nullptr;
 PFNGLDISABLEPROC                                glDisable = nullptr;
 PFNGLENABLEPROC                                 glEnable = nullptr;
+PFNGLENABLEIPROC                                glEnablei = nullptr;
+PFNGLDISABLEIPROC                               glDisablei = nullptr;
 PFNGLFINISHPROC                                 glFinish = nullptr;
 PFNGLFLUSHPROC                                  glFlush = nullptr;
 
@@ -50,17 +52,26 @@ PFNGLBLENDFUNCPROC                              glBlendFunc = nullptr;
 PFNGLBLENDFUNCSEPARATEPROC                      glBlendFuncSeparate = nullptr;
 PFNGLLOGICOPPROC                                glLogicOp = nullptr;
 
+// GL_ARB_draw_buffers_blend
+PFNGLBLENDEQUATIONSEPARATEIPROC                 glBlendEquationSeparatei = nullptr;
+PFNGLBLENDFUNCSEPARATEIPROC                     glBlendFuncSeparatei = nullptr;
+
 // depth buffer
 PFNGLDEPTHRANGEPROC                             glDepthRange = nullptr;
 PFNGLCLEARDEPTHPROC                             glClearDepth = nullptr;
 PFNGLDEPTHMASKPROC                              glDepthMask = nullptr;
 PFNGLDEPTHFUNCPROC                              glDepthFunc = nullptr;
+PFNGLPOLYGONOFFSETPROC                          glPolygonOffset = nullptr;
 
 // stencil buffer
 PFNGLCLEARSTENCILPROC                           glClearStencil = nullptr;
 PFNGLSTENCILMASKPROC                            glStencilMask = nullptr;
 PFNGLSTENCILFUNCPROC                            glStencilFunc = nullptr;
 PFNGLSTENCILOPPROC                              glStencilOp = nullptr;
+
+PFNGLSTENCILFUNCSEPARATEPROC                    glStencilFuncSeparate = nullptr;
+PFNGLSTENCILOPSEPARATEPROC                      glStencilOpSeparate = nullptr;
+
 
 // polygon 
 PFNGLLINEWIDTHPROC                              glLineWidth = nullptr;
@@ -297,6 +308,12 @@ PFNGLDELETESYNCPROC                             glDeleteSync = nullptr;
 PFNGLWAITSYNCPROC                               glWaitSync = nullptr;
 PFNGLGETSYNCIVPROC                              glGetSynciv = nullptr;
 
+PFNGLVIEWPORTARRAYVPROC                         glViewportArrayv = nullptr;
+PFNGLSCISSORARRAYVPROC                          glScissorArrayv = nullptr;
+PFNGLVIEWPORTINDEXEDFPROC                       glViewportIndexedf = nullptr;
+PFNGLDEPTHRANGEARRAYVPROC                       glDepthRangeArrayv = nullptr;
+PFNGLDEPTHRANGEINDEXEDPROC                      glDepthRangeIndexed = nullptr;
+
 void gl::Context::LoadFunctions( void )
 {
     glGetIntegerv = reinterpret_cast<PFNGLGETINTEGERVPROC>( GetFunctionPointer( "glGetIntegerv" ) );
@@ -304,6 +321,8 @@ void gl::Context::LoadFunctions( void )
     glIsEnabled = reinterpret_cast<PFNGLISENABLEDPROC>( GetFunctionPointer( "glIsEnabled" ) );
     glDisable = reinterpret_cast<PFNGLDISABLEPROC>( GetFunctionPointer( "glDisable" ) );
     glEnable = reinterpret_cast<PFNGLENABLEPROC>( GetFunctionPointer( "glEnable" ) );
+    glEnablei = reinterpret_cast<PFNGLENABLEIPROC>( GetFunctionPointer( "glEnablei" ) );
+    glDisablei = reinterpret_cast<PFNGLDISABLEIPROC>( GetFunctionPointer( "glDisablei" ) );
     glFinish = reinterpret_cast<PFNGLFINISHPROC>( GetFunctionPointer( "glFinish" ) );
     glFlush = reinterpret_cast<PFNGLFLUSHPROC>( GetFunctionPointer( "glFlush" ) );
 
@@ -325,11 +344,16 @@ void gl::Context::LoadFunctions( void )
     glBlendFuncSeparate = reinterpret_cast<PFNGLBLENDFUNCSEPARATEPROC>( GetFunctionPointer( "glBlendFuncSeparate" ) );
     glLogicOp = reinterpret_cast<PFNGLLOGICOPPROC>( GetFunctionPointer( "glLogicOp" ) );
 
+    // GL_ARB_draw_buffers_blend
+    glBlendEquationSeparatei = reinterpret_cast<PFNGLBLENDEQUATIONSEPARATEIPROC>( GetFunctionPointer( "glBlendEquationSeparatei" ) );
+    glBlendFuncSeparatei = reinterpret_cast<PFNGLBLENDFUNCSEPARATEIPROC>( GetFunctionPointer( "glBlendFuncSeparatei" ) );
+
     // depth buffer
     glDepthRange = reinterpret_cast<PFNGLDEPTHRANGEPROC>( GetFunctionPointer( "glDepthRange" ) );
     glClearDepth = reinterpret_cast<PFNGLCLEARDEPTHPROC>( GetFunctionPointer( "glClearDepth" ) );
     glDepthMask = reinterpret_cast<PFNGLDEPTHMASKPROC>( GetFunctionPointer( "glDepthMask" ) );
     glDepthFunc = reinterpret_cast<PFNGLDEPTHFUNCPROC>( GetFunctionPointer( "glDepthFunc" ) );
+    glPolygonOffset =reinterpret_cast<PFNGLPOLYGONOFFSETPROC>( GetFunctionPointer( "glPolygonOffset" ) );
 
     // stencil buffer
     glClearStencil = reinterpret_cast<PFNGLCLEARSTENCILPROC>( GetFunctionPointer( "glClearStencil" ) );
@@ -570,5 +594,12 @@ void gl::Context::LoadFunctions( void )
     glClientWaitSync = reinterpret_cast<PFNGLCLIENTWAITSYNCPROC>( GetFunctionPointer( "glClientWaitSync" ) );
     glDeleteSync = reinterpret_cast<PFNGLDELETESYNCPROC>( GetFunctionPointer( "glDeleteSync" ) );
     glWaitSync = reinterpret_cast<PFNGLWAITSYNCPROC>( GetFunctionPointer( "glWaitSync" ) );
-    glGetSynciv = reinterpret_cast<PFNGLGETSYNCIVPROC>( GetFunctionPointer( "glGetSynciv" ) );   
+    glGetSynciv = reinterpret_cast<PFNGLGETSYNCIVPROC>( GetFunctionPointer( "glGetSynciv" ) );
+
+    // GL_ARB_viewport_array
+    glViewportArrayv = reinterpret_cast<PFNGLVIEWPORTARRAYVPROC>( GetFunctionPointer( "glViewportArrayv" ) );
+    glScissorArrayv = reinterpret_cast<PFNGLSCISSORARRAYVPROC>( GetFunctionPointer( "glScissorArrayv" ) );
+    glViewportIndexedf = reinterpret_cast<PFNGLVIEWPORTINDEXEDFPROC>( GetFunctionPointer( "glViewportIndexedf" ) );
+    glDepthRangeArrayv = reinterpret_cast<PFNGLDEPTHRANGEARRAYVPROC>( GetFunctionPointer( "glDepthRangeArrayv" ) );
+    glDepthRangeIndexed = reinterpret_cast<PFNGLDEPTHRANGEINDEXEDPROC>( GetFunctionPointer( "glDepthRangeIndexed" ) );
 }

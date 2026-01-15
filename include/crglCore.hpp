@@ -29,6 +29,8 @@ extern PFNGLGETINTEGER64VPROC                           glGetInteger64v;
 extern PFNGLISENABLEDPROC                               glIsEnabled;
 extern PFNGLDISABLEPROC                                 glDisable;
 extern PFNGLENABLEPROC                                  glEnable;
+extern PFNGLENABLEIPROC                                 glEnablei;
+extern PFNGLDISABLEIPROC                                glDisablei;
 extern PFNGLFINISHPROC                                  glFinish;
 extern PFNGLFLUSHPROC                                   glFlush;
 
@@ -40,9 +42,6 @@ extern PFNGLHINTPROC                                    glHint;
 extern PFNGLVIEWPORTPROC                                glViewport;
 extern PFNGLSCISSORPROC                                 glScissor;
 
-// clear buffer 
-
-extern PFNGLBLENDFUNCPROC                               glBlendFunc;
 
 // color buffer 
 extern PFNGLCLEARCOLORPROC                              glClearColor;
@@ -51,11 +50,16 @@ extern PFNGLCLEARPROC                                   glClear;
 extern PFNGLBLENDFUNCSEPARATEPROC                       glBlendFuncSeparate;
 extern PFNGLLOGICOPPROC                                 glLogicOp;
 
+// GL_ARB_draw_buffers_blend
+extern PFNGLBLENDEQUATIONSEPARATEIPROC                  glBlendEquationSeparatei;
+extern PFNGLBLENDFUNCSEPARATEIPROC                      glBlendFuncSeparatei;
+
 // depth buffer
 extern PFNGLDEPTHRANGEPROC                              glDepthRange;
 extern PFNGLCLEARDEPTHPROC                              glClearDepth;
 extern PFNGLDEPTHMASKPROC                               glDepthMask;
 extern PFNGLDEPTHFUNCPROC                               glDepthFunc;
+extern PFNGLPOLYGONOFFSETPROC                           glPolygonOffset;
 
 // stencil buffer
 extern PFNGLCLEARSTENCILPROC                            glClearStencil;
@@ -295,6 +299,13 @@ extern PFNGLCLIENTWAITSYNCPROC                          glClientWaitSync;
 extern PFNGLDELETESYNCPROC                              glDeleteSync;
 extern PFNGLWAITSYNCPROC                                glWaitSync;
 extern PFNGLGETSYNCIVPROC                               glGetSynciv;
+
+// GL_ARB_viewport_array
+extern PFNGLVIEWPORTARRAYVPROC                          glViewportArrayv;
+extern PFNGLSCISSORARRAYVPROC                           glScissorArrayv;
+extern PFNGLVIEWPORTINDEXEDFPROC                        glViewportIndexedf;
+extern PFNGLDEPTHRANGEARRAYVPROC                        glDepthRangeArrayv;
+extern PFNGLDEPTHRANGEINDEXEDPROC                       glDepthRangeIndexed;
 
 typedef struct glCoreBuffer_t                           glCoreBuffer_t;
 typedef struct glCoreShader_t                           glCoreShader_t;
