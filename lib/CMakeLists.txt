@@ -28,4 +28,4 @@ set( CRVK_SOURCES
 add_library( crglLib STATIC ${CRVK_SOURCES} )
 target_include_directories( crglLib  PRIVATE ../include )
 target_include_directories( crglLib  PRIVATE ${CMAKE_SOURCE_DIR} )
-target_precompile_headers( crglLib PUBLIC "$<$<COMPILE_LANGUAGE:CXX>:source/crglPrecompiled.hpp>" )
+target_precompile_headers( crglLib PRIVATE "$<$<COMPILE_LANGUAGE:CXX>:../source/crglPrecompiled.hpp>" )
