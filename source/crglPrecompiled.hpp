@@ -28,6 +28,7 @@
 #include <limits> // std::numeric_limits
 
 #include "crglCore.hpp"
+#include "crglEnumerators.hpp"
 #include "crglFence.hpp"
 #include "crglContext.hpp"
 

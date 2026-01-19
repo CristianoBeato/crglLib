@@ -315,7 +315,7 @@ gl::viewport_t gl::Context::SetViewportState(const GLuint in_viewport, const vie
 {
     viewport_t current = m_state.viewports[in_viewport]; 
 
-    if ( in_viewport >= m_features.maxViewports )
+    if ( in_viewport >= static_cast<GLuint>( m_features.maxViewports ) )
     {
         // todo append a error
         return {};
