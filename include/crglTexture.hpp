@@ -18,12 +18,12 @@
  For full license terms, see the LICENSE file in the root of this repository.
 ===============================================================================================
 */
-#ifndef __CRGL_IMAGE_HPP__
-#define __CRGL_IMAGE_HPP__
+#ifndef __CRGL_TEXTURE_HPP__
+#define __CRGL_TEXTURE_HPP__
 
 namespace gl
 {
-    class Image
+    class Texture
     {
     public:
         enum target_t
@@ -64,10 +64,10 @@ namespace gl
         };
         
 
-        Image( void );
-        ~Image( void );
+        Texture( void );
+        ~Texture( void );
 
-        bool    Create( const target_t in_target, 
+        bool    Create( const GLenum in_target, 
                         const GLenum in_internalformat, 
                         const GLsizei in_levels,
                         const GLsizei in_layers, 
@@ -149,7 +149,7 @@ namespace gl
         operator GLuint( void ) const;
 
     private:
-        glCoreImage_t*  m_image;
+        glCoreTexture_t*  m_image;
     };
 };
-#endif //!__CRGL_IMAGE_HPP__
+#endif //!__CRGL_TEXTURE_HPP__

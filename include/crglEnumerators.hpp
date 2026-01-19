@@ -172,7 +172,7 @@ namespace gl
     
     namespace buffer
     {
-        enum buffer_target_t : GLenum
+        enum target_t : GLenum
         {
             /// @brief Vertex attributes
             ARRAY_BUFFER                = GL_ARRAY_BUFFER,
@@ -220,7 +220,7 @@ namespace gl
             UNIFORM_BUFFER              = GL_UNIFORM_BUFFER
         };
 
-        enum buffer_usage_t : GLenum
+        enum usage_t : GLenum
         {
             /// @brief The data store contents will be specified once by the application,
             /// and sourced at most a few times.
@@ -259,7 +259,7 @@ namespace gl
             DYNAMIC_COPY = GL_DYNAMIC_COPY
         };
 
-        enum buffer_access_t : GLenum
+        enum access_t : GLenum
         {
             /// @brief 
             READ_ONLY,
@@ -271,7 +271,7 @@ namespace gl
             READ_WRITE
         };
 
-        enum buffer_access_flags_t : GLbitfield
+        enum access_flags_t : GLbitfield
         {
             /// @brief Indicates that the returned pointer may be used to read
             /// buffer object data. No GL error is generated if the pointer is used to query
@@ -336,7 +336,7 @@ namespace gl
 
     namespace texture
     {  
-        enum texture_target_t : GLenum
+        enum target_t : GLenum
         {
             TEXTURE_1D =                     GL_TEXTURE_1D, 
             TEXTURE_2D =                     GL_TEXTURE_2D, 

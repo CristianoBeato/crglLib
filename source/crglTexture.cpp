@@ -22,26 +22,26 @@
 #include "crglPrecompiled.hpp"
 #include "crglImage.hpp"
 
-static const char k_INVALID_CREATE_TEXTURE_TARGET_MSG[41] = { "gl::Image::Create invalid texture target" };
-static const char k_INVALID_SUBIMAGE_TEXTURE_TARGET_MSG[44] = { "gl::Image::SubImage invalid texture target " };
+static const char k_INVALID_CREATE_TEXTURE_TARGET_MSG[41] = { "gl::Texture::Create invalid texture target" };
+static const char k_INVALID_SUBIMAGE_TEXTURE_TARGET_MSG[44] = { "gl::Texture::SubImage invalid texture target " };
 
-typedef struct glCoreImage_t
+typedef struct glCoreTexture_t
 {
-    gl::Image::target_t     target = gl::Image::TEXTURE_NONE;
+    gl::Texture::target_t     target = gl::Texture::TEXTURE_NONE;
     gl::Format              format = 0;
     GLuint                  image = 0;
-} glCoreImage_t;
+} glCoreTexture_t;
 
-gl::Image::Image( void ) : m_image( nullptr )
+gl::Texture::Texture( void ) : m_image( nullptr )
 {
 }
 
-gl::Image::~Image( void )
+gl::Texture::~Texture( void )
 {
     Destroy();
 }
 
-bool gl::Image::Create( 
+bool gl::Texture::Create( 
     const target_t in_target, 
     const GLenum in_internalformat, 
     const GLsizei in_levels,
@@ -50,7 +50,7 @@ bool gl::Image::Create(
 {
     Destroy();
 
-    m_image = new glCoreImage_t();
+    m_image = new glCoreTexture_t();
     m_image->target = in_target;
     m_image->format = in_internalformat;
     glCreateTextures( m_image->target, 1, &m_image->image );
@@ -91,7 +91,7 @@ bool gl::Image::Create(
     return m_image->image != 0 && glIsTexture( m_image->image ) == GL_TRUE;
 }
 
-void gl::Image::Destroy( void )
+void gl::Texture::Destroy( void )
 {
     if ( m_image == nullptr )
         return;
@@ -106,7 +106,7 @@ void gl::Image::Destroy( void )
     m_image = nullptr;
 }
 
-void gl::Image::SubImage(   const GLint in_level,
+void gl::Texture::SubImage(   const GLint in_level,
                             const offsets_t in_offsets,
                             const dimensions_t in_dimensions,
                             const void* in_pixels, const bool in_invBGR ) const
@@ -145,7 +145,7 @@ void gl::Image::SubImage(   const GLint in_level,
     }
 }
 
-void gl::Image::GetImage( const GLint in_level, const GLsizei in_bufSize, void *in_pixels ) const
+void gl::Texture::GetImage( const GLint in_level, const GLsizei in_bufSize, void *in_pixels ) const
 {
     GLenum format = GL_NONE;
     GLenum type = GL_NONE;
@@ -160,7 +160,7 @@ void gl::Image::GetImage( const GLint in_level, const GLsizei in_bufSize, void *
     glGetTextureImage( m_image->image, in_level, format, type, in_bufSize, in_pixels );
 }
 
-void gl::Image::GetCompressedImage( const GLint in_level, const GLsizei in_bufSize, void * in_pixels ) const
+void gl::Texture::GetCompressedImage( const GLint in_level, const GLsizei in_bufSize, void * in_pixels ) const
 {
     if( !m_image )
     {   
@@ -171,7 +171,7 @@ void gl::Image::GetCompressedImage( const GLint in_level, const GLsizei in_bufSi
     glGetCompressedTextureImage( m_image->image, in_level, in_bufSize, in_pixels );
 }
 
-void gl::Image::CopySubImage(   const GLint in_level, 
+void gl::Texture::CopySubImage(   const GLint in_level, 
                                 const GLint in_x, 
                                 const GLint in_y, 
                                 const offsets_t in_offsets, 
@@ -205,7 +205,7 @@ void gl::Image::CopySubImage(   const GLint in_level,
     }
 }
 
-void gl::Image::GetSubImage(    const GLint in_level,
+void gl::Texture::GetSubImage(    const GLint in_level,
                                 const offsets_t in_offsets,
                                 const dimensions_t in_dimensions,
                                 const GLenum in_type,
@@ -237,7 +237,7 @@ void gl::Image::GetSubImage(    const GLint in_level,
     
 }
 
-void gl::Image::GetCompressedSubImage(  const GLint in_level,
+void gl::Texture::GetCompressedSubImage(  const GLint in_level,
                                         const offsets_t in_offsets,
                                         const dimensions_t in_dimensions,
                                         const GLsizei in_bufSize,
@@ -262,7 +262,7 @@ void gl::Image::GetCompressedSubImage(  const GLint in_level,
 }
 
 
-void gl::Image::CopyImage(  const GLenum in_srcTarget,
+void gl::Texture::CopyImage(  const GLenum in_srcTarget,
                             const GLuint in_source, 
                             const GLint in_srcLevel,
                             const GLint in_dstLevel,
@@ -293,7 +293,7 @@ void gl::Image::CopyImage(  const GLenum in_srcTarget,
                         in_dimensions.depth );
 }
 
-void gl::Image::Invalidate( const GLint in_level, const offsets_t in_offsets, const dimensions_t in_dimensions ) const
+void gl::Texture::Invalidate( const GLint in_level, const offsets_t in_offsets, const dimensions_t in_dimensions ) const
 {
     if ( !m_image )
     {
@@ -308,7 +308,7 @@ void gl::Image::Invalidate( const GLint in_level, const offsets_t in_offsets, co
         glInvalidateTexSubImage( m_image->image, in_level, in_offsets.xoffset, in_offsets.yoffset, in_offsets.zoffset, in_dimensions.width, in_dimensions.height, in_dimensions.depth );
 }
 
-void gl::Image::Clear( const void* in_data, const GLint in_level, const offsets_t in_offsets, const dimensions_t in_dimensions ) const
+void gl::Texture::Clear( const void* in_data, const GLint in_level, const offsets_t in_offsets, const dimensions_t in_dimensions ) const
 {
     GLenum format = GL_NONE;
     GLenum type = GL_NONE;
@@ -332,7 +332,7 @@ void gl::Image::Clear( const void* in_data, const GLint in_level, const offsets_
             in_data );    
 }
 
-void gl::Image::Parameterfv(const GLenum in_pName, const GLfloat *m_params ) const
+void gl::Texture::Parameterfv(const GLenum in_pName, const GLfloat *m_params ) const
 {
     if ( !m_image )
     {
@@ -343,7 +343,7 @@ void gl::Image::Parameterfv(const GLenum in_pName, const GLfloat *m_params ) con
     glTextureParameterfv( m_image->image, in_pName, m_params );   
 }
 
-void gl::Image::GetParameteriv(const GLenum in_pName, GLint *m_params ) const
+void gl::Texture::GetParameteriv(const GLenum in_pName, GLint *m_params ) const
 {
     if ( !m_image )
     {
@@ -354,7 +354,7 @@ void gl::Image::GetParameteriv(const GLenum in_pName, GLint *m_params ) const
     glGetTextureParameteriv( m_image->image, in_pName, m_params );
 }
 
-void gl::Image::GetParameterfv(const GLenum in_pName, GLfloat *m_params ) const
+void gl::Texture::GetParameterfv(const GLenum in_pName, GLfloat *m_params ) const
 {
     if ( !m_image )
     {
@@ -365,7 +365,7 @@ void gl::Image::GetParameterfv(const GLenum in_pName, GLfloat *m_params ) const
     glGetTextureParameterfv( m_image->image, in_pName, m_params );
 }
 
-void gl::Image::Parameteriv( const GLenum in_pName, const GLint* m_params ) const
+void gl::Texture::Parameteriv( const GLenum in_pName, const GLint* m_params ) const
 {
     if ( !m_image )
     {
@@ -376,7 +376,7 @@ void gl::Image::Parameteriv( const GLenum in_pName, const GLint* m_params ) cons
     glTextureParameteriv( m_image->image, in_pName, m_params );
 }
 
-GLuint gl::Image::Handle(void) const
+GLuint gl::Texture::Handle(void) const
 {
     if ( !m_image )
     {
@@ -387,12 +387,12 @@ GLuint gl::Image::Handle(void) const
     return m_image->image;
 }
 
-GLenum gl::Image::Target(void) const
+GLenum gl::Texture::Target(void) const
 {
     return m_image->target;
 }
 
-gl::Image::operator GLuint(void) const
+gl::Texture::operator GLuint(void) const
 {
     if ( !m_image )
     {

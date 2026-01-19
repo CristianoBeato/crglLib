@@ -316,7 +316,7 @@ typedef struct glCoreShader_t                           glCoreShader_t;
 typedef struct glCoreProgram_t                          glCoreProgram_t;
 typedef struct glCorePipeline_t                         glCorePipeline_t;
 typedef struct glCoreVertexArray_t                      glCoreVertexArray_t;
-typedef struct glCoreImage_t                            glCoreImage_t;
+typedef struct glCoreTexture_t                          glCoreTexture_t;
 typedef struct glCoreSampler_t                          glCoreSampler_t;
 typedef struct glCoreImageHandler_t                     glCoreImageHandler_t;                     
 typedef struct glCoreFramebuffer_t                      glCoreFramebuffer_t;
@@ -329,7 +329,7 @@ typedef struct glCoreRenderbuffer_t                     glCoreRenderbuffer_t;
 #include "crglVertexArray.hpp"
 #include "crglFormat.hpp"
 #include "crglSampler.hpp"
-#include "crglImage.hpp"
+#include "crglTexture.hpp"
 #include "crglImageHandler.hpp"
 #include "crglFrameBuffer.hpp"
 #include "crglContext.hpp"
