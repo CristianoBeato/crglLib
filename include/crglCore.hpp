@@ -220,6 +220,11 @@ extern PFNGLGETTEXTUREIMAGEPROC					        glGetTextureImage;
 extern PFNGLGETCOMPRESSEDTEXTUREIMAGEPROC               glGetCompressedTextureImage;
 extern PFNGLINVALIDATETEXIMAGEPROC                      glInvalidateTexImage;
 
+// GL_ARB_compressed_texture_pixel_storage
+extern PFNGLCOMPRESSEDTEXTURESUBIMAGE1DPROC             glCompressedTextureSubImage1D;
+extern PFNGLCOMPRESSEDTEXTURESUBIMAGE2DPROC             glCompressedTextureSubImage2D;
+extern PFNGLCOMPRESSEDTEXTURESUBIMAGE3DPROC             glCompressedTextureSubImage3D;
+
 // GL_ARB_invalidate_subdata
 extern PFNGLINVALIDATETEXSUBIMAGEPROC                   glInvalidateTexSubImage;
 

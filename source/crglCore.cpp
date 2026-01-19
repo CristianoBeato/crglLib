@@ -224,6 +224,11 @@ PFNGLGETTEXTUREIMAGEPROC                        glGetTextureImage = nullptr;
 PFNGLGETCOMPRESSEDTEXTUREIMAGEPROC              glGetCompressedTextureImage = nullptr;
 PFNGLINVALIDATETEXIMAGEPROC                     glInvalidateTexImage = nullptr;
 
+// GL_ARB_compressed_texture_pixel_storage
+PFNGLCOMPRESSEDTEXTURESUBIMAGE1DPROC            glCompressedTextureSubImage1D = nullptr;
+PFNGLCOMPRESSEDTEXTURESUBIMAGE2DPROC            glCompressedTextureSubImage2D = nullptr;
+PFNGLCOMPRESSEDTEXTURESUBIMAGE3DPROC            glCompressedTextureSubImage3D = nullptr;
+
 // GL_ARB_invalidate_subdata
 PFNGLINVALIDATETEXSUBIMAGEPROC                  glInvalidateTexSubImage = nullptr;
 
@@ -516,6 +521,11 @@ void gl::Context::LoadFunctions( void )
     glGetTextureImage = reinterpret_cast<PFNGLGETTEXTUREIMAGEPROC>( GetFunctionPointer( "glGetTextureImage" ) );
     glGetCompressedTextureImage = reinterpret_cast<PFNGLGETCOMPRESSEDTEXTUREIMAGEPROC>( GetFunctionPointer( "glGetCompressedTextureImage" ) );
     glInvalidateTexImage = reinterpret_cast<PFNGLINVALIDATETEXIMAGEPROC>( GetFunctionPointer( "glInvalidateTexImage" ) );
+
+    // GL_ARB_compressed_texture_pixel_storage
+    glCompressedTextureSubImage1D = reinterpret_cast<PFNGLCOMPRESSEDTEXTURESUBIMAGE1DPROC>( GetFunctionPointer( "glCompressedTextureSubImage1D" ) );
+    glCompressedTextureSubImage2D = reinterpret_cast<PFNGLCOMPRESSEDTEXTURESUBIMAGE2DPROC>( GetFunctionPointer( "glCompressedTextureSubImage2D" ) );
+    glCompressedTextureSubImage3D = reinterpret_cast<PFNGLCOMPRESSEDTEXTURESUBIMAGE3DPROC>( GetFunctionPointer( "glCompressedTextureSubImage3D" ) );
 
     // GL_ARB_invalidate_subdata
     glInvalidateTexSubImage = reinterpret_cast<PFNGLINVALIDATETEXSUBIMAGEPROC>( GetFunctionPointer( "glInvalidateTexSubImage" ) );
