@@ -26,20 +26,6 @@ namespace gl
     class Texture
     {
     public:
-        enum target_t
-        {
-            TEXTURE_NONE = GL_NONE,
-            TEXTURE_1D = GL_TEXTURE_1D,
-            TEXTURE_1D_ARRAY = GL_TEXTURE_1D_ARRAY,
-            TEXTURE_2D = GL_TEXTURE_2D,
-            TEXTURE_2D_ARRAY = GL_TEXTURE_2D_ARRAY,
-            TEXTURE_2D_MULTISAMPLE = GL_TEXTURE_2D_MULTISAMPLE,
-            TEXTURE_2D_MULTISAMPLE_ARRAY = GL_TEXTURE_2D_MULTISAMPLE_ARRAY,
-            TEXTURE_3D = GL_TEXTURE_3D,
-            TEXTURE_CUBE_MAP = GL_TEXTURE_CUBE_MAP,
-            TEXTURE_CUBE_MAP_ARRAY = GL_TEXTURE_CUBE_MAP_ARRAY,
-            TEXTURE_RECTANGLE = GL_TEXTURE_RECTANGLE
-        };
 
         struct offsets_t
         {
@@ -57,46 +43,72 @@ namespace gl
 
         struct subImage_t
         {
-            GLint           level;      // mip level
-            GLuint          layer;      //
-            offsets_t       offsets;    //
+            /// @brief the mipmap level
+            GLint           level;
+
+            /// @brief the multilayer image level / cubemap face
+            GLsizei         layer;      //
+
+            /// @brief compressed pixel buffer size
+            GLsizei         imageSize;
+
+            // pixel offsets 
+            offsets_t       offsets;
+
+            /// @brief dimensions of the subimage
             dimensions_t    dimension;  //
         };
         
+        struct createInfo_t
+        {
+            /// @brief texture type 1/2/3D, Cubemap, rectangle, multisample, array
+            GLenum          target; 
+
+            /// @brief texture pixel format
+            gl::Format      format; 
+
+            /// @brief number of mipmap levels
+            GLsizei         levels;
+
+            /// @brief number of layers for TEXTURE_*D_ARRAY / TEXTURE_CUBE_MAP_ARRAY
+            GLsizei         layers; 
+
+            /// @brief sample count for TEXTURE_2D_MULTISAMPLE and TEXTURE_2D_MULTISAMPLE_ARRAY
+            GLsizei         samples;
+
+            /// @brief image width, height and depth dimensions 
+            dimensions_t    dimensions;
+
+            GLboolean       fixedsamplelocations;
+        }; 
 
         Texture( void );
         ~Texture( void );
 
-        bool    Create( const GLenum in_target, 
-                        const GLenum in_internalformat, 
-                        const GLsizei in_levels,
-                        const GLsizei in_layers, 
-                        const dimensions_t in_dimensions );
+        /// @brief Create image handler and allocate fixed memory
+        /// @param in_createInfo 
+        /// @return true on sucess 
+        bool    Create( const createInfo_t* in_createInfo );
 
+        /// @brief destroy image handle and free image memory 
         void    Destroy( void );
-        void    SubImage(   const GLint in_level, 
-                            const offsets_t in_offsets,
-                            const dimensions_t in_dimensions,   
-                            const void *in_pixels, const bool in_invBGR = false ) const;
+
+        /// @brief Upload pixels to a sub image
+        /// @param in_subimage subimage representation data  
+        /// @param in_pixels pixel buffer/upack buffer offset
+        void    SubImage( const subImage_t *in_subimage, const void *in_pixels ) const;
+
+        /// @brief 
+        /// @param in_subimage 
+        /// @param in_pixels 
+        void    CompressedSubImage( const subImage_t *in_subimage, const void *in_pixels );
 
         /// @brief Return the whole image data
         void GetImage( const GLint in_level, const GLsizei in_bufSize, void * in_pixels ) const;
         void GetCompressedImage( const GLint in_level, const GLsizei in_bufSize, void * in_pixels ) const; 
 
         /// @brief copy the content of the current frame buffer to the image 
-        /// @param in_level 
-        /// @param in_xoffset 
-        /// @param in_yoffset 
-        /// @param in_zoffset 
-        /// @param in_x 
-        /// @param in_y 
-        /// @param in_width 
-        /// @param in_height 
-        void    CopySubImage(   const GLint in_level,
-                                const GLint in_x,
-                                const GLint in_y,
-                                const offsets_t in_offsets,
-                                const dimensions_t in_dimensions ) const;
+        void CopySubImage( const subImage_t *in_subimage, const GLint in_x, const GLint in_y ) const;
 
         /// @brief retrieve the content of the image level
         /// @param level 

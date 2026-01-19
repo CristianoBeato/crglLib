@@ -20,14 +20,14 @@
 */
 
 #include "crglPrecompiled.hpp"
-#include "crglImage.hpp"
+#include "crglTexture.hpp"
 
-static const char k_INVALID_CREATE_TEXTURE_TARGET_MSG[41] = { "gl::Texture::Create invalid texture target" };
-static const char k_INVALID_SUBIMAGE_TEXTURE_TARGET_MSG[44] = { "gl::Texture::SubImage invalid texture target " };
+static const char k_INVALID_CREATE_TEXTURE_TARGET_MSG[43] = { "gl::Texture::Create invalid texture target" };
+static const char k_INVALID_SUBIMAGE_TEXTURE_TARGET_MSG[46] = { "gl::Texture::SubImage invalid texture target " };
 
 typedef struct glCoreTexture_t
 {
-    gl::Texture::target_t     target = gl::Texture::TEXTURE_NONE;
+    GLenum                  target = gl::texture::TEXTURE_1D;
     gl::Format              format = 0;
     GLuint                  image = 0;
 } glCoreTexture_t;
@@ -41,48 +41,76 @@ gl::Texture::~Texture( void )
     Destroy();
 }
 
-bool gl::Texture::Create( 
-    const target_t in_target, 
-    const GLenum in_internalformat, 
-    const GLsizei in_levels,
-    const GLsizei in_layers, 
-    const dimensions_t in_dimensions )
+bool gl::Texture::Create( const createInfo_t* in_createInfo )
 {
+    GLenum  format = GL_NONE;
+    GLsizei levels = 0;
+    GLsizei layers = 0;
+    GLsizei samples = 1;
+    GLsizei width = 0;
+    GLsizei height = 0;
+    GLsizei depth = 0;
+
+    /// invalid creation info passed
+    if ( !in_createInfo )
+    {
+        // TODO: apend error:
+        return false;
+    }
+    
     Destroy();
 
     m_image = new glCoreTexture_t();
-    m_image->target = in_target;
-    m_image->format = in_internalformat;
-    glCreateTextures( m_image->target, 1, &m_image->image );
     
+    /// set image target and format
+    m_image->target = in_createInfo->target;
+    m_image->format = in_createInfo->format;
+
+    ///
+    format  = in_createInfo->format.internalFormat;
+    levels  = in_createInfo->levels;
+    layers  = in_createInfo->layers;
+    samples = in_createInfo->samples;
+    width   = in_createInfo->dimensions.width;
+    height  = in_createInfo->dimensions.height;
+    depth   = in_createInfo->dimensions.depth;
+
+    /// create texture handler 
+    glCreateTextures( m_image->target, 1, &m_image->image );
+    if ( m_image->image == 0 )
+        return false;
+
     // allocate the texture memory
     switch ( m_image->target )
     {
-    case GL_TEXTURE_1D:
-        glTextureStorage1D( m_image->image, in_levels, m_image->format, in_dimensions.width );
+    case texture::TEXTURE_1D:
+        glTextureStorage1D( m_image->image, levels, format, width );
         break;
-    case GL_TEXTURE_1D_ARRAY:
-        glTextureStorage2D( m_image->image, in_levels, m_image->format, in_dimensions.width, in_layers );
+    case texture::TEXTURE_1D_ARRAY:
+        glTextureStorage2D( m_image->image, levels, format, width, layers );
         break;
-    case GL_TEXTURE_2D:
-    case GL_TEXTURE_RECTANGLE:
-        glTextureStorage2D( m_image->image, in_levels, m_image->format, in_dimensions.width, in_dimensions.height );
+    case texture::TEXTURE_2D:
+    case texture::TEXTURE_RECTANGLE:
+        glTextureStorage2D( m_image->image, levels, format, width, height );
         break;
-    case GL_TEXTURE_3D:
-        glTextureStorage3D( m_image->image, in_levels, m_image->format, in_dimensions.width, in_dimensions.height, in_dimensions.depth );
+    case texture::TEXTURE_3D:
+        glTextureStorage3D( m_image->image, levels, format, width, height, depth );
         break;
-    case GL_TEXTURE_2D_ARRAY:
-        glTextureStorage3D( m_image->image, in_levels, m_image->format, in_dimensions.width, in_dimensions.height, in_dimensions.depth );
+    case texture::TEXTURE_2D_ARRAY:
+        glTextureStorage3D( m_image->image, levels, format, width, height, layers );
         break;
-    case GL_TEXTURE_CUBE_MAP:
-        glTextureStorage3D( m_image->image, in_levels, m_image->format, in_dimensions.width, in_dimensions.height, 6 );
+    case texture::TEXTURE_CUBE_MAP:
+        glTextureStorage3D( m_image->image, levels, format, width, height, 6 );
         break;
-    case GL_TEXTURE_CUBE_MAP_ARRAY:
-        glTextureStorage3D( m_image->image, in_levels, m_image->format, in_dimensions.width, in_dimensions.width, in_dimensions.depth );
+    case texture::TEXTURE_CUBE_MAP_ARRAY:
+        glTextureStorage3D( m_image->image, levels, format, width, width, layers * 6 );
         break;
-        // TODO: multisample textures
-        // GL_TEXTURE_2D_MULTISAMPLE
-        // GL_TEXTURE_2D_MULTISAMPLE_ARRAY
+    case texture::TEXTURE_2D_MULTISAMPLE:
+        glTextureStorage2DMultisample( m_image->image, samples, format, width, height, in_createInfo->fixedsamplelocations );
+        break;
+    case texture::TEXTURE_2D_MULTISAMPLE_ARRAY:
+        glTextureStorage3DMultisample( m_image->image, samples, format, width, height, depth, in_createInfo->fixedsamplelocations );
+        break;
     default:
         glDebugMessageInsert( GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, 41, k_INVALID_CREATE_TEXTURE_TARGET_MSG );
         return false;
@@ -106,50 +134,136 @@ void gl::Texture::Destroy( void )
     m_image = nullptr;
 }
 
-void gl::Texture::SubImage(   const GLint in_level,
-                            const offsets_t in_offsets,
-                            const dimensions_t in_dimensions,
-                            const void* in_pixels, const bool in_invBGR ) const
+void gl::Texture::SubImage( const subImage_t *in_subimage, const void* in_pixels ) const
 {
-    GLenum format = GL_NONE;
-    GLenum type = GL_NONE;
+    GLint   level = 0;
+    GLsizei layer = 0;
+    GLsizei xoffset = 0;
+    GLsizei yoffset = 0;
+    GLsizei zoffset = 0;
+    GLsizei width = 0;
+    GLsizei height = 0;
+    GLsizei depth = 0;
+    GLenum  format = GL_NONE;
+    GLenum  type = GL_NONE;
 
-    if( !m_image )
+    if( !m_image || m_image->image == 0 )
     {   
         // TODO: report a error 
         return;
     }
 
-    format = m_image->format.ColorChanels( in_invBGR );
+    level = in_subimage->level;
+    xoffset = in_subimage->offsets.xoffset;
+    yoffset = in_subimage->offsets.yoffset;
+    zoffset = in_subimage->offsets.zoffset;
+    width = in_subimage->dimension.width;
+    height = in_subimage->dimension.height;
+    depth = in_subimage->dimension.depth;
+    format = m_image->format.format;
     type = m_image->format.DataType();
 
     switch ( m_image->target )
     {
-    case GL_TEXTURE_1D:
-        glTextureSubImage1D( m_image->image, in_level, in_offsets.xoffset, in_dimensions.width, format, type, in_pixels );
+    case texture::TEXTURE_1D:
+        glTextureSubImage1D( m_image->image, level, xoffset, width, format, type, in_pixels );
         break;
-    case GL_TEXTURE_1D_ARRAY:
-    case GL_TEXTURE_2D:
-    case GL_TEXTURE_RECTANGLE:
-        glTextureSubImage2D( m_image->image, in_level, in_offsets.xoffset, in_offsets.yoffset, in_dimensions.width, in_dimensions.height, format, type, in_pixels );
+
+    case texture::TEXTURE_1D_ARRAY:
+        glTextureSubImage2D( m_image->image, level, xoffset, layer, width, 1,  format, type, in_pixels );
+        break;
+
+    case texture::TEXTURE_2D:
+    case texture::TEXTURE_RECTANGLE:
+        glTextureSubImage2D( m_image->image, level, xoffset, yoffset, width, height, format, type, in_pixels );
         break;        
-    case GL_TEXTURE_2D_ARRAY:
-    case GL_TEXTURE_CUBE_MAP:
-    case GL_TEXTURE_3D:
-    case GL_TEXTURE_CUBE_MAP_ARRAY:
-        glTextureSubImage3D( m_image->image, in_level, in_offsets.xoffset, in_offsets.yoffset, in_offsets.zoffset, in_dimensions.width, in_dimensions.height, in_dimensions.depth, format, type, in_pixels );
+
+    case texture::TEXTURE_2D_ARRAY:
+        glTextureSubImage3D( m_image->image, level, xoffset, yoffset, layer, width, height, 1, format, type, in_pixels );
         break;        
+
+    case texture::TEXTURE_3D:
+        glTextureSubImage3D( m_image->image, level, xoffset, yoffset, zoffset, width, height, depth, format, type, in_pixels );
+        break;        
+        
+    case texture::TEXTURE_CUBE_MAP:
+    case texture::TEXTURE_CUBE_MAP_ARRAY:
+        glTextureSubImage3D( m_image->image, level, xoffset, yoffset, layer, width, width, 1, format, type, in_pixels );
+        break;
+    
     default:
         glDebugMessageInsert( GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, 44, k_INVALID_SUBIMAGE_TEXTURE_TARGET_MSG );
         break;
     }
 }
 
-void gl::Texture::GetImage( const GLint in_level, const GLsizei in_bufSize, void *in_pixels ) const
+void gl::Texture::CompressedSubImage(const subImage_t *in_subimage, const void *in_pixels)
+{
+    GLint   level = 0;
+    GLsizei layer = 0;
+    GLsizei xoffset = 0;
+    GLsizei yoffset = 0;
+    GLsizei zoffset = 0;
+    GLsizei width = 0;
+    GLsizei height = 0;
+    GLsizei depth = 0;
+    GLsizei imageSize = 0;
+    GLenum  format = GL_NONE;
+    
+    if( !m_image || m_image->image == 0 )
+    {   
+        // TODO: report a error 
+        return;
+    }
+
+    level = in_subimage->level;
+    layer = in_subimage->layer;
+    xoffset = in_subimage->offsets.xoffset;
+    yoffset = in_subimage->offsets.yoffset;
+    zoffset = in_subimage->offsets.zoffset;
+    width = in_subimage->dimension.width;
+    height = in_subimage->dimension.height;
+    depth = in_subimage->dimension.depth;
+    imageSize = in_subimage->imageSize;
+    format = m_image->format.format;
+    
+    switch ( m_image->target )
+    {
+        case texture::TEXTURE_1D:
+            glCompressedTextureSubImage1D( m_image->image, level, xoffset, width, format, imageSize, in_pixels );
+            break;
+
+        case texture::TEXTURE_2D:
+        case texture::TEXTURE_RECTANGLE:
+            glCompressedTextureSubImage2D( m_image->image, level, xoffset, yoffset, width, height, format, imageSize, in_pixels );
+            break;
+
+        case texture::TEXTURE_3D:
+            glCompressedTextureSubImage3D( m_image->image, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, in_pixels );
+            break;
+
+        case texture::TEXTURE_1D_ARRAY:
+            glCompressedTextureSubImage2D( m_image->image, level, xoffset, layer, width, 1, format, imageSize, in_pixels );
+            break;
+            
+        case texture::TEXTURE_2D_ARRAY:
+            glCompressedTextureSubImage3D( m_image->format, level, xoffset, yoffset, layer, width, height, 1, format, imageSize, in_pixels );
+            break;
+        case texture::TEXTURE_CUBE_MAP:
+        case texture::TEXTURE_CUBE_MAP_ARRAY:
+            glCompressedTextureSubImage3D( m_image->format, level, xoffset, yoffset, layer, width, width, 1, format, imageSize, in_pixels );
+            break;
+        default:
+        break;
+    }
+
+}
+
+void gl::Texture::GetImage(const GLint in_level, const GLsizei in_bufSize, void *in_pixels) const
 {
     GLenum format = GL_NONE;
     GLenum type = GL_NONE;
-    if( !m_image )
+    if( !m_image || m_image->image )
     {   
         // TODO: report a error 
         return;
@@ -171,34 +285,60 @@ void gl::Texture::GetCompressedImage( const GLint in_level, const GLsizei in_buf
     glGetCompressedTextureImage( m_image->image, in_level, in_bufSize, in_pixels );
 }
 
-void gl::Texture::CopySubImage(   const GLint in_level, 
-                                const GLint in_x, 
-                                const GLint in_y, 
-                                const offsets_t in_offsets, 
-                                const dimensions_t in_dimensions ) const
+void gl::Texture::CopySubImage( const subImage_t *in_subimage, const GLint in_x, const GLint in_y ) const
 {
-    if( !m_image )
+    GLsizei level = 0; 
+    GLsizei layer = 0;
+    GLsizei xoffset = 0; 
+    GLsizei yoffset = 0;
+    GLsizei zoffset = 0;
+    GLsizei width = 0;
+    GLsizei height = 0;
+    //GLsizei depth = 0;
+
+    if( !m_image || m_image->image )
     {   
         // TODO: report a error 
         return;
     }
 
+    level = in_subimage->level;
+    layer = in_subimage->layer;
+    xoffset = in_subimage->offsets.xoffset;
+    yoffset = in_subimage->offsets.yoffset;
+    zoffset = in_subimage->offsets.zoffset;
+    width = in_subimage->dimension.width;
+    height = in_subimage->dimension.height;
+    //depth = in_subimage->dimension.depth;
+
     switch ( m_image->target )
     {
-    case GL_TEXTURE_1D:
-        glCopyTextureSubImage1D( m_image->image, in_level, in_offsets.xoffset, in_x, in_y, in_dimensions.width );
+    case texture::TEXTURE_1D:
+        glCopyTextureSubImage1D( m_image->image, level, xoffset, in_x, in_y, width );
         break;
-    case GL_TEXTURE_1D_ARRAY:
-    case GL_TEXTURE_2D:
-    case GL_TEXTURE_RECTANGLE:
-        glCopyTextureSubImage2D( m_image->image, in_level, in_offsets.xoffset, in_offsets.yoffset, in_x, in_y, in_dimensions.width, in_dimensions.height );
+
+    case texture::TEXTURE_1D_ARRAY:
+        glCopyTextureSubImage2D( m_image->image, level, xoffset, layer, in_x, in_y, width, 1 );
         break;
-    case GL_TEXTURE_2D_ARRAY:
-    case GL_TEXTURE_CUBE_MAP:
-    case GL_TEXTURE_3D:
-    case GL_TEXTURE_CUBE_MAP_ARRAY:
-        glCopyTextureSubImage3D( m_image->image, in_level, in_offsets.xoffset, in_offsets.yoffset, in_offsets.zoffset, in_x, in_y, in_dimensions.width, in_dimensions.height );
+
+    case texture::TEXTURE_2D:
+    case texture::TEXTURE_RECTANGLE:
+        glCopyTextureSubImage2D( m_image->image, level, xoffset, yoffset, in_x, in_y, width, height );
         break;
+
+    case texture::TEXTURE_2D_ARRAY:
+        glCopyTextureSubImage3D( m_image->image, level, xoffset, layer, in_x, in_y, width, height, 1 );
+        break;
+    
+    case texture::TEXTURE_3D:
+        glCopyTextureSubImage3D( m_image->image, level, xoffset, yoffset, zoffset, in_x, in_y, width, height );
+        break;
+
+    case texture::TEXTURE_CUBE_MAP:
+    case texture::TEXTURE_CUBE_MAP_ARRAY:
+        glCopyTextureSubImage3D( m_image->image, level, xoffset, yoffset, layer, in_x, in_y, width, height );
+        break;
+
     default:
         // TODO: error call
         break;
@@ -334,7 +474,7 @@ void gl::Texture::Clear( const void* in_data, const GLint in_level, const offset
 
 void gl::Texture::Parameterfv(const GLenum in_pName, const GLfloat *m_params ) const
 {
-    if ( !m_image )
+    if ( !m_image || m_image->image == 0 )
     {
         // report a error
         return;
