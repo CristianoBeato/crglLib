@@ -44,13 +44,13 @@ namespace gl
         struct subImage_t
         {
             /// @brief the mipmap level
-            GLint           level;
+            GLint           level = 0;
 
             /// @brief the multilayer image level / cubemap face
-            GLsizei         layer;      //
+            GLsizei         layer = 0;
 
             /// @brief compressed pixel buffer size
-            GLsizei         imageSize;
+            GLsizei         imageSize = 0;
 
             // pixel offsets 
             offsets_t       offsets;
@@ -62,23 +62,25 @@ namespace gl
         struct createInfo_t
         {
             /// @brief texture type 1/2/3D, Cubemap, rectangle, multisample, array
-            GLenum          target; 
+            GLenum          target = GL_NONE;
+
+
+            /// @brief number of mipmap levels
+            GLsizei         levels = 1;
+
+            /// @brief number of layers for TEXTURE_*D_ARRAY / TEXTURE_CUBE_MAP_ARRAY
+            GLsizei         layers = 1; 
+
+            /// @brief sample count for TEXTURE_2D_MULTISAMPLE and TEXTURE_2D_MULTISAMPLE_ARRAY
+            GLsizei         samples = 1;
 
             /// @brief texture pixel format
             gl::Format      format; 
 
-            /// @brief number of mipmap levels
-            GLsizei         levels;
-
-            /// @brief number of layers for TEXTURE_*D_ARRAY / TEXTURE_CUBE_MAP_ARRAY
-            GLsizei         layers; 
-
-            /// @brief sample count for TEXTURE_2D_MULTISAMPLE and TEXTURE_2D_MULTISAMPLE_ARRAY
-            GLsizei         samples;
-
             /// @brief image width, height and depth dimensions 
             dimensions_t    dimensions;
 
+            /// @brief 
             GLboolean       fixedsamplelocations;
         }; 
 
