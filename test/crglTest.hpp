@@ -39,8 +39,8 @@ private:
     gl::Buffer*         m_vertexPos;
     gl::Buffer*         m_vertexCol;
     gl::FrameBuffer*    m_framebuffer;
-    gl::Image*          m_framebufferAttach;
-    gl::Image*          m_image;
+    gl::Texture*        m_framebufferAttach;
+    gl::Texture*        m_image;
     gl::Sampler*        m_sampler;
 
     void    InitSDL3( void );

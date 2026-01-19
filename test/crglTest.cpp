@@ -69,7 +69,7 @@ const crVertexColor colors[4] =
 };
 
 static void CreateShader( gl::Shader* in_shader, const GLenum in_stage, const char* in_path );
-static void CreateImage( gl::Image * image, const char* in_path );
+static void CreateImage( gl::Texture * image, const char* in_path );
 
 int main( int argc, char *argv[] )
 {
@@ -333,11 +333,14 @@ void crApp::InitOpenGL( void )
     m_vertexArray->BindeVertexBuffers( vbuffers, voffsets, vstrides, 0, 2 );
 
     // Create framebuffer attachament
-    gl::Image::dimensions_t dim{};
-    dim.width = 640;
-    dim.height = 420;
-    m_framebufferAttach = new gl::Image();
-    m_framebufferAttach->Create( GL_TEXTURE_2D, GL_RGBA8, 1, 0, dim );
+    gl::Texture::createInfo_t textureCI{}; 
+    textureCI.target = GL_TEXTURE_2D;
+    textureCI.format.internalFormat = GL_RGBA8;
+    textureCI.format.format = GL_RGBA;
+    textureCI.dimensions.width = 640;
+    textureCI.dimensions.height = 420;
+    m_framebufferAttach = new gl::Texture();
+    m_framebufferAttach->Create( &textureCI );
 
     // create framebuffer
     gl::FrameBuffer::attachament_t attch{};
@@ -350,7 +353,7 @@ void crApp::InitOpenGL( void )
     m_framebuffer->Attach( &attch, 0, 1 );
 
     // create and load texture
-    m_image = new gl::Image();
+    m_image = new gl::Texture();
     CreateImage( m_image, "image/grid.bmp" );
 
     m_sampler = new gl::Sampler();
@@ -492,9 +495,10 @@ void CreateShader( gl::Shader* in_shader, const GLenum in_stage, const char* in_
     source = nullptr;
 }
 
-void CreateImage( gl::Image * image, const char* in_path )
+void CreateImage( gl::Texture * image, const char* in_path )
 {
     GLenum internalFormat = GL_NONE;
+    GLenum format = GL_NONE;
     SDL_Surface* imageSurf = SDL_LoadBMP( in_path );
     if ( !imageSurf )
         throw std::runtime_error( SDL_GetError() );
@@ -503,21 +507,27 @@ void CreateImage( gl::Image * image, const char* in_path )
     {
     case SDL_PIXELFORMAT_RGBA4444:
         internalFormat = GL_RGBA4;
+        format = GL_RGBA;
         break;
     case SDL_PIXELFORMAT_RGBA5551:
         internalFormat = GL_RGB5_A1;
+        format = GL_RGB;
         break;
     case SDL_PIXELFORMAT_RGB565:
         internalFormat = GL_RGB565;
+        format = GL_RGB;
         break;
     case SDL_PIXELFORMAT_RGB24:
         internalFormat = GL_RGB8;
+        format = GL_RGB;
         break;
     case SDL_PIXELFORMAT_BGR24:
         internalFormat = GL_RGB8;
+        format = GL_BGR;
         break;
     case SDL_PIXELFORMAT_RGBA8888:
         internalFormat = GL_RGBA8UI;
+        format = GL_RGBA;
         break;
     
     default:
@@ -526,16 +536,21 @@ void CreateImage( gl::Image * image, const char* in_path )
     }
 
     // Create the image
-    gl::Image::dimensions_t dim{};
-    dim.width = imageSurf->w;
-    dim.height = imageSurf->h;
-    dim.depth = 0;
-    image->Create( GL_TEXTURE_2D, internalFormat, 1, 1, dim );
+    gl::Texture::createInfo_t imageCI{};
+    imageCI.target = GL_TEXTURE_2D; 
+    imageCI.dimensions.width = imageSurf->w;
+    imageCI.dimensions.height = imageSurf->h;
+    imageCI.dimensions.depth = 0;
+    imageCI.format.internalFormat = internalFormat;
+    imageCI.format.format = format;
+    image->Create( &imageCI );
     
-    gl::Image::offsets_t offsets{ 0, 0, 0 };
+    gl::Texture::subImage_t subimage{};
+    subimage.dimension.width = imageSurf->w;
+    subimage.dimension.height = imageSurf->h;
     
     // upload image
-    image->SubImage( 0, offsets, dim, imageSurf->pixels, true );
+    image->SubImage( &subimage, imageSurf->pixels );
 
     SDL_DestroySurface( imageSurf );
 }
