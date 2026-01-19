@@ -127,7 +127,8 @@ namespace gl
 {
     struct Format
     {
-        GLenum internalFormat;
+        GLenum internalFormat;  // pixel depth
+        GLenum format;          // RGBA format
 
         Format( void ) : internalFormat( GL_NONE )
         {
