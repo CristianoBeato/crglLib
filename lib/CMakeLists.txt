@@ -6,7 +6,7 @@ set( CRVK_SOURCES
     ../source/crglFormat.cpp
     ../source/crglFrameBuffer.cpp
     ../source/crglSampler.cpp
-    ../source/crglImage.cpp
+    ../source/crglTexture.cpp
     ../source/crglImageHandler.cpp
     ../source/crglContext.cpp
     ../source/crglBuffer.cpp
@@ -19,7 +19,7 @@ set( CRVK_SOURCES
     ../include/crglFormat.hpp
     ../include/crglFrameBuffer.hpp
     ../include/crglSampler.hpp
-    ../include/crglImage.hpp
+    ../include/crglTexture.hpp
     ../include/crglBuffer.hpp
     ../include/crglShaders.hpp
     ../include/crglVertexArray.hpp
