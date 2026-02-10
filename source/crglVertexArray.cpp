@@ -6,10 +6,10 @@ static const char k_INVALID_VERTEX_BUFFER_MSG[77] = "gl::VertexArray::BindeVerte
 
 typedef struct glCoreVertexArray_t
 {
-    GLuint  vertexArray = 0;
-    GLuint  elementBuffer = 0;
-    GLuint  numVertexBuffers = 0;
-    GLuint* vertexBuffers = nullptr;
+    GLuint                                  vertexArray = 0;
+    GLuint                                  elementBuffer = 0;
+    GLuint                                  numVertexBuffers = 0;
+    gl::VertexArray::bufferBindingPoint_t*  vertexBuffers = nullptr;
 }glCoreVertexArray_t;
 
 gl::VertexArray::VertexArray( void ) : m_vertexArray( nullptr )
@@ -89,40 +89,74 @@ void gl::VertexArray::BindElementBuffer( const GLuint in_buffer )
     }
 }
 
-void gl::VertexArray::BindeVertexBuffers( const GLuint *in_buffers, const GLintptr *in_offsets, const GLsizei *in_strides, const GLuint in_first, const GLsizei in_count )
+void gl::VertexArray::BindeVertexBuffer(const bufferBindingPoint_t in_bufferBinding, const GLuint in_bindingindex )
 {
+    GLuint bufferCount = in_bindingindex + 1;
+
+    // realloc buffers to fit 
+    if ( m_vertexArray->numVertexBuffers < bufferCount )
+    {
+        if ( m_vertexArray->vertexBuffers == nullptr )
+            m_vertexArray->vertexBuffers = static_cast<bufferBindingPoint_t*>( std::malloc( sizeof( bufferBindingPoint_t ) * bufferCount ) );
+        else
+            m_vertexArray->vertexBuffers = static_cast<bufferBindingPoint_t*>( std::realloc( m_vertexArray->vertexBuffers, sizeof( bufferBindingPoint_t ) * bufferCount ) );
+        m_vertexArray->numVertexBuffers = bufferCount; 
+    }
+
+#if !defined( NDEBUG ) // we don't check on releases 
+    if ( glIsBuffer( in_bufferBinding.buffer ) != GL_TRUE )
+    {
+        glDebugMessageInsert( GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, 77, k_INVALID_VERTEX_BUFFER_MSG );
+        return;
+    }
+#endif
+    // bind buffer at designed position
+    glVertexArrayVertexBuffer( m_vertexArray->vertexArray, in_bindingindex, in_bufferBinding.buffer, in_bufferBinding.offset, in_bufferBinding.stride );
+    // store buffer binding configuration 
+    m_vertexArray->vertexBuffers[in_bindingindex] = in_bufferBinding;   
+}
+
+void gl::VertexArray::BindeVertexBuffers( const bufferBindingPoint_t* in_bindings, const GLuint in_first, const GLsizei in_count )
+{
+    // TODO:  
+    GLuint      buffers[16]{}; 
+    GLintptr    offsets[16]{}; 
+    GLsizei     strides[16]{};    
+
     GLuint bufferCount = in_first + in_count; //
     
     // realloc buffers to fit 
     if ( m_vertexArray->numVertexBuffers < bufferCount )
     {
         if ( m_vertexArray->vertexBuffers == nullptr )
-            m_vertexArray->vertexBuffers = static_cast<GLuint*>( std::malloc( sizeof( GLuint ) * bufferCount ) );
+            m_vertexArray->vertexBuffers = static_cast<bufferBindingPoint_t*>( std::malloc( sizeof( GLuint ) * bufferCount ) );
         else
-            m_vertexArray->vertexBuffers = static_cast<GLuint*>( std::realloc( m_vertexArray->vertexBuffers, sizeof( GLuint ) * bufferCount ) );
+            m_vertexArray->vertexBuffers = static_cast<bufferBindingPoint_t*>( std::realloc( m_vertexArray->vertexBuffers, sizeof( GLuint ) * bufferCount ) );
         m_vertexArray->numVertexBuffers = bufferCount; 
     }
     
     //store buffer binding, and check
-    for ( GLsizei i = in_first; i < in_count; i++)
+    for ( GLsizei i = 0; i < in_count; i++)
     {
 #if !defined( NDEBUG ) // we don't check on releases 
-        if ( glIsBuffer( in_buffers[i] ) != GL_TRUE )
+        if ( glIsBuffer( in_bindings[i].buffer ) != GL_TRUE )
         {
             glDebugMessageInsert( GL_DEBUG_SOURCE_THIRD_PARTY, GL_DEBUG_TYPE_ERROR, 0, GL_DEBUG_SEVERITY_HIGH, 77, k_INVALID_VERTEX_BUFFER_MSG );
             return;
         }
 #endif
-
-        m_vertexArray->vertexBuffers[i] = in_buffers[i];
+        // store buffer info
+        buffers[i] = in_bindings[i].buffer;
+        offsets[i] = in_bindings[i].offset;
+        strides[i] = in_bindings[i].stride;
     }
 
     // bind buffers
-    glVertexArrayVertexBuffers( m_vertexArray->vertexArray, in_first, in_count, in_buffers, in_offsets, in_strides );        
-
+    glVertexArrayVertexBuffers( m_vertexArray->vertexArray, in_first, in_count, buffers, offsets, strides );
+    std::memcpy( &m_vertexArray->vertexBuffers[in_first], in_bindings, sizeof( bufferBindingPoint_t) * in_count ); 
 }
 
-GLuint gl::VertexArray::GetHandle( void ) const
+GLuint gl::VertexArray::GetHandle(void) const
 {
     return m_vertexArray->vertexArray;
 }
